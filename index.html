@@ -624,6 +624,7 @@
           <button class="timer-btn" id="btn-timer-reset">Reiniciar</button>
         </div>
       </div>
+      <div id="wakelock-status" style="font-size:11.5px; margin-top:8px; color:var(--text-muted);"></div>
     </div>
   </div>
 
@@ -1510,16 +1511,46 @@ document.addEventListener('visibilitychange', () => {
     requestWakeLock();
   }
 });
+document.getElementById('viewer').addEventListener('click', () => {
+  if(!wakeLock && document.getElementById('viewer').classList.contains('active')){
+    requestWakeLock();
+  }
+});
 
 /* ---------------- Mantener la pantalla encendida mientras se teje ---------------- */
 let wakeLock = null;
+function updateWakeLockStatus(state){
+  const el = document.getElementById('wakelock-status');
+  if(!el) return;
+  if(state === 'active'){
+    el.textContent = '🔒 Pantalla fija mientras tejes';
+    el.style.color = 'var(--accent-3)';
+  } else if(state === 'failed'){
+    el.textContent = '⚠️ No se pudo fijar la pantalla. Revisa que el celular no esté en modo ahorro de batería.';
+    el.style.color = 'var(--text-muted)';
+  } else if(state === 'released'){
+    el.textContent = '⚠️ El sistema apagó el fijado de pantalla (puede pasar si entra el ahorro de batería). Toca la pantalla para reactivarlo.';
+    el.style.color = 'var(--text-muted)';
+  } else {
+    el.textContent = '';
+  }
+}
 async function requestWakeLock(){
   try{
     if('wakeLock' in navigator){
       wakeLock = await navigator.wakeLock.request('screen');
+      updateWakeLockStatus('active');
+      wakeLock.addEventListener('release', () => {
+        if(document.getElementById('viewer').classList.contains('active')){
+          updateWakeLockStatus('released');
+        }
+      });
+    } else {
+      updateWakeLockStatus('failed');
     }
   }catch(e){
-    // Si el navegador lo bloquea (por ejemplo, fuera de una página https), simplemente no se activa.
+    // Suele fallar si el celular está en modo ahorro de batería, entre otras razones fuera de nuestro control.
+    updateWakeLockStatus('failed');
   }
 }
 function releaseWakeLock(){
@@ -1527,6 +1558,7 @@ function releaseWakeLock(){
     wakeLock.release().catch(() => {});
     wakeLock = null;
   }
+  updateWakeLockStatus(null);
 }
 
 /* ---------------- Calculadora de costos ---------------- */
@@ -2287,7 +2319,8 @@ function drawWatermarkComposite(ctx, w, h){
 function renderWatermarkPreview(){
   if(!wmState.photoImg) return;
   const canvas = document.getElementById('watermark-preview-canvas');
-  const maxPreviewWidth = Math.min(460, document.querySelector('.cost-form').clientWidth);
+  const containerWidth = document.querySelector('#watermark .cost-form').clientWidth || (window.innerWidth - 40);
+  const maxPreviewWidth = Math.min(460, containerWidth);
   const scale = maxPreviewWidth / wmState.photoImg.naturalWidth;
   canvas.width = Math.round(wmState.photoImg.naturalWidth * scale);
   canvas.height = Math.round(wmState.photoImg.naturalHeight * scale);
