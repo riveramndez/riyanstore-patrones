@@ -556,6 +556,7 @@
     </div>
     <button class="add-btn secondary costs-entry-btn" id="btn-free-counter"><span class="plus">🧵</span> Contador libre (sin patrón)</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-watermark"><span class="plus">🖼️</span> Marca de agua en fotos</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-qr"><span class="plus">🔗</span> Generador de código QR</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-costs"><span class="plus">🧮</span> Calculadora de costos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-orders"><span class="plus">📋</span> Pedidos pendientes</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-ideas"><span class="plus">💡</span> Ideas para regalos</button>
@@ -838,6 +839,47 @@
     </div>
   </div>
 
+  <!-- QR HOME SCREEN -->
+  <div id="qr-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-qr-back-home">‹</button>
+      <div class="viewer-title">Códigos QR</div>
+    </div>
+    <div class="costs-list-wrap">
+      <button class="add-btn" id="btn-new-qr" style="margin:16px 20px 8px;"><span class="plus">+</span> Nuevo código QR</button>
+      <div class="pattern-list" id="qr-list"></div>
+    </div>
+  </div>
+
+  <!-- QR DETAIL SCREEN -->
+  <div id="qr-detail" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-qr-detail-back">‹</button>
+      <input type="text" id="qr-name-input" class="cost-name-input" placeholder="Nombre (ej. Pedido de Ana)">
+      <button class="icon-btn" id="btn-qr-delete" style="color:var(--danger);">🗑</button>
+    </div>
+    <div class="cost-form">
+      <div class="cost-section">
+        <div class="cost-section-title">Enlace</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Pega aquí el link del video, audio, fotos o carta (YouTube no listado, Google Drive, etc.)</p>
+        <textarea id="qr-url-input" placeholder="https://..." style="min-height:56px;"></textarea>
+      </div>
+
+      <div class="cost-section" id="qr-preview-section" style="display:none;">
+        <div class="cost-section-title">Vista previa</div>
+        <div class="wm-preview-wrap" style="display:flex; justify-content:center; padding:20px;">
+          <div id="qr-canvas-holder"></div>
+        </div>
+        <button class="add-btn" id="btn-qr-download" style="margin-top:14px;"><span class="plus">⬇️</span> Descargar imagen del QR</button>
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Notas (opcional)</div>
+        <textarea id="qr-notes-input" placeholder="Ej. Para el llavero de resina del pedido de Ana"></textarea>
+      </div>
+    </div>
+  </div>
+
   <!-- ORDER DETAIL SCREEN -->
   <div id="order-detail" class="screen">
     <div class="viewer-top">
@@ -969,6 +1011,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -2467,6 +2510,162 @@ document.getElementById('btn-watermark-download').addEventListener('click', () =
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }, 'image/jpeg', 0.95);
+});
+
+/* ---------------- Generador de código QR ---------------- */
+const QR_KEY = 'amigurumi_qrcodes_v1';
+let currentQr = null;
+let qrInstance = null;
+
+function loadQrs(){
+  try{
+    const raw = localStorage.getItem(QR_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveQrs(list){
+  localStorage.setItem(QR_KEY, JSON.stringify(list));
+}
+function getQr(id){
+  return loadQrs().find(q => q.id === id) || null;
+}
+function updateQr(q){
+  const list = loadQrs();
+  const idx = list.findIndex(x => x.id === q.id);
+  if(idx >= 0) list[idx] = q; else list.push(q);
+  saveQrs(list);
+}
+function persistCurrentQr(){
+  if(!currentQr) return;
+  updateQr(currentQr);
+}
+
+document.getElementById('btn-open-qr').addEventListener('click', () => {
+  renderQrHome();
+  showScreen('qr-home');
+});
+document.getElementById('btn-qr-back-home').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function renderQrHome(){
+  const list = document.getElementById('qr-list');
+  const qrs = loadQrs().sort((a, b) => b.createdAt - a.createdAt);
+  if(qrs.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🔗</div><p>Aún no tienes códigos QR guardados. Crea uno para cada pedido con mensaje o video.</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  qrs.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'pattern-card';
+    card.innerHTML =
+      '<div class="thumb">🔗</div>' +
+      '<div class="info"><div class="name"></div><div class="meta"></div></div>' +
+      '<button class="del">✕</button>';
+    card.querySelector('.name').textContent = q.name || 'Código sin nombre';
+    card.querySelector('.meta').textContent = q.url ? q.url.slice(0, 40) + (q.url.length > 40 ? '…' : '') : 'Sin enlace todavía';
+    card.addEventListener('click', (e) => {
+      if(e.target.closest('.del')) return;
+      openQrDetail(q.id);
+    });
+    card.querySelector('.del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(confirm('¿Borrar este código QR? No se puede deshacer.')){
+        saveQrs(loadQrs().filter(x => x.id !== q.id));
+        renderQrHome();
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('btn-new-qr').addEventListener('click', () => {
+  const newQr = { id: uid(), name: '', url: '', notes: '', createdAt: Date.now() };
+  updateQr(newQr);
+  openQrDetail(newQr.id);
+});
+
+function openQrDetail(id){
+  currentQr = getQr(id);
+  if(!currentQr) return;
+  document.getElementById('qr-name-input').value = currentQr.name || '';
+  document.getElementById('qr-url-input').value = currentQr.url || '';
+  document.getElementById('qr-notes-input').value = currentQr.notes || '';
+  updateQrPreview();
+  showScreen('qr-detail');
+}
+
+function updateQrPreview(){
+  const section = document.getElementById('qr-preview-section');
+  const holder = document.getElementById('qr-canvas-holder');
+  const url = (currentQr.url || '').trim();
+  if(!url){
+    section.style.display = 'none';
+    holder.innerHTML = '';
+    qrInstance = null;
+    return;
+  }
+  section.style.display = 'block';
+  holder.innerHTML = '';
+  qrInstance = new QRCode(holder, {
+    text: url,
+    width: 512,
+    height: 512,
+    colorDark: '#1E2A28',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  const canvas = holder.querySelector('canvas');
+  if(canvas){ canvas.style.width = '220px'; canvas.style.height = '220px'; }
+}
+
+document.getElementById('qr-name-input').addEventListener('input', (e) => {
+  if(!currentQr) return;
+  currentQr.name = e.target.value;
+  persistCurrentQr();
+});
+document.getElementById('qr-url-input').addEventListener('input', (e) => {
+  if(!currentQr) return;
+  currentQr.url = e.target.value;
+  persistCurrentQr();
+  updateQrPreview();
+});
+document.getElementById('qr-notes-input').addEventListener('input', (e) => {
+  if(!currentQr) return;
+  currentQr.notes = e.target.value;
+  persistCurrentQr();
+});
+
+document.getElementById('btn-qr-download').addEventListener('click', () => {
+  const holder = document.getElementById('qr-canvas-holder');
+  const canvas = holder.querySelector('canvas');
+  if(!canvas) return;
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const safeName = (currentQr.name || 'codigo-qr').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'codigo-qr';
+    a.download = safeName + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }, 'image/png');
+});
+
+document.getElementById('btn-qr-detail-back').addEventListener('click', () => {
+  currentQr = null;
+  renderQrHome();
+  showScreen('qr-home');
+});
+document.getElementById('btn-qr-delete').addEventListener('click', () => {
+  if(!currentQr) return;
+  if(!confirm('¿Borrar este código QR? No se puede deshacer.')) return;
+  saveQrs(loadQrs().filter(q => q.id !== currentQr.id));
+  currentQr = null;
+  renderQrHome();
+  showScreen('qr-home');
 });
 
 /* ---------------- Init ---------------- */
