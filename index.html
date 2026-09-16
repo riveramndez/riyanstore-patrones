@@ -400,6 +400,9 @@
     display:inline-block; font-size:11.5px; padding:2px 9px; border-radius:20px;
     background:var(--surface-2); color:var(--accent-3); margin-right:6px;
   }
+  .order-alert{ font-size:11.5px; font-weight:600; margin-bottom:2px; }
+  .order-alert.warn{ color:var(--accent); }
+  .order-alert.danger{ color:var(--danger); }
   .cost-form textarea{
     width:100%; box-sizing:border-box; min-height:72px; resize:vertical;
     background:var(--surface); border:1px solid var(--border); color:var(--text);
@@ -557,8 +560,10 @@
     <button class="add-btn secondary costs-entry-btn" id="btn-free-counter"><span class="plus">🧵</span> Contador libre (sin patrón)</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-watermark"><span class="plus">🖼️</span> Marca de agua en fotos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-qr"><span class="plus">🔗</span> Generador de código QR</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-messages"><span class="plus">💬</span> Mensajes rápidos</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-backup"><span class="plus">⚙️</span> Respaldo de mis datos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-costs"><span class="plus">🧮</span> Calculadora de costos</button>
-    <button class="add-btn secondary costs-entry-btn" id="btn-open-orders"><span class="plus">📋</span> Pedidos pendientes</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-orders"><span class="plus">📋</span> Pedidos pendientes<span id="orders-urgent-badge" style="color:var(--danger); font-weight:700;"></span></button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-ideas"><span class="plus">💡</span> Ideas para regalos</button>
     <div class="pattern-list" id="pattern-list"></div>
     <input type="file" id="file-input" accept="application/pdf">
@@ -743,6 +748,7 @@
           <label>Por si lo ajustas o lo redondeas</label>
           <input type="number" inputmode="decimal" id="cost-sell-price" min="0" step="1">
         </div>
+        <button class="add-btn" id="btn-cost-whatsapp" style="margin-top:12px; background:#25D366; color:#0b2b18;">📲 Enviar cotización por WhatsApp</button>
       </div>
     </div>
 
@@ -880,6 +886,57 @@
     </div>
   </div>
 
+  <!-- MESSAGES HOME SCREEN -->
+  <div id="messages-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-messages-back-home">‹</button>
+      <div class="viewer-title">Mensajes rápidos</div>
+    </div>
+    <div class="costs-list-wrap">
+      <button class="add-btn" id="btn-new-message" style="margin:16px 20px 8px;"><span class="plus">+</span> Nuevo mensaje</button>
+      <div class="pattern-list" id="messages-list"></div>
+    </div>
+  </div>
+
+  <!-- MESSAGE DETAIL SCREEN -->
+  <div id="message-detail" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-message-detail-back">‹</button>
+      <input type="text" id="message-name-input" class="cost-name-input" placeholder="Nombre (ej. Bienvenida)">
+      <button class="icon-btn" id="btn-message-delete" style="color:var(--danger);">🗑</button>
+    </div>
+    <div class="cost-form">
+      <div class="cost-section">
+        <div class="cost-section-title">Texto del mensaje</div>
+        <textarea id="message-text-input" placeholder="Escribe aquí tu mensaje..." style="min-height:120px;"></textarea>
+      </div>
+      <button class="add-btn" id="btn-message-whatsapp" style="background:#25D366; color:#0b2b18;">📲 Abrir en WhatsApp</button>
+      <button class="add-btn secondary" id="btn-message-copy" style="margin-top:10px;">📋 Copiar texto</button>
+    </div>
+  </div>
+
+  <!-- BACKUP SCREEN -->
+  <div id="backup" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-backup-back">‹</button>
+      <div class="viewer-title">Respaldo de mis datos</div>
+    </div>
+    <div class="cost-form">
+      <div class="cost-section">
+        <div class="cost-section-title">Exportar</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Guarda una copia de todo lo que tienes en la app (patrones, pedidos, costeos, ideas, códigos QR y mensajes) en un solo archivo.</p>
+        <button class="add-btn" id="btn-export-backup"><span class="plus">⬇️</span> Exportar respaldo</button>
+      </div>
+      <div class="cost-section">
+        <div class="cost-section-title">Restaurar</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Usa esto si cambiaste de celular o borraste el navegador. <b>Reemplaza todo lo que tengas guardado ahora</b> por lo que traiga el archivo de respaldo.</p>
+        <button class="add-btn secondary" id="btn-import-backup"><span class="plus">⬆️</span> Restaurar desde respaldo</button>
+        <input type="file" id="backup-file-input" accept="application/json" style="display:none;">
+      </div>
+      <p class="scan-hint" id="backup-status" style="margin-top:6px;"></p>
+    </div>
+  </div>
+
   <!-- ORDER DETAIL SCREEN -->
   <div id="order-detail" class="screen">
     <div class="viewer-top">
@@ -948,6 +1005,7 @@
           <button type="button" class="status-chip" data-status="Entregado">Entregado</button>
         </div>
         <button class="add-btn" id="btn-order-whatsapp" style="display:none; margin-top:14px; background:#25D366; color:#0b2b18;">📲 Avisar que está listo (WhatsApp)</button>
+        <button class="add-btn" id="btn-order-payment-reminder" style="display:none; margin-top:10px; background:var(--surface); color:var(--text); border:1px solid var(--border);">💰 Recordar saldo pendiente (WhatsApp)</button>
       </div>
 
       <div class="cost-section">
@@ -1111,6 +1169,7 @@ function showScreen(name){
 /* ---------------- HOME: listar patrones ---------------- */
 async function renderHome(){
   stopTimerInterval();
+  updateOrdersUrgentBadge();
   const list = document.getElementById('pattern-list');
   const patterns = await dbGetAll();
   patterns.sort((a,b) => b.createdAt - a.createdAt);
@@ -1909,6 +1968,20 @@ document.getElementById('cost-sell-price').addEventListener('input', (e) => {
   persistCurrentCost();
 });
 
+document.getElementById('btn-cost-whatsapp').addEventListener('click', () => {
+  if(!currentCost) return;
+  const t = computeTotals(currentCost);
+  const finalPrice = currentCost.sellPrice != null && currentCost.sellPrice > 0
+    ? currentCost.sellPrice
+    : Math.ceil(t.price / 10) * 10;
+  const productName = currentCost.name || 'tu pedido';
+  let msg = '¡Hola! 🧶 Aquí tienes la cotización de *' + productName + '*:\n\n';
+  msg += '💰 Precio: ' + money(finalPrice) + '\n\n';
+  msg += '¿Deseas que continuemos con tu pedido?';
+  const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+});
+
 document.getElementById('cost-name-input').addEventListener('input', (e) => {
   if(!currentCost) return;
   currentCost.name = e.target.value;
@@ -1975,9 +2048,30 @@ document.getElementById('btn-orders-back-home').addEventListener('click', () => 
   showScreen('home');
 });
 
+function getOrderUrgency(o){
+  if(o.status === 'Entregado' || !o.dueDate) return null;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const due = new Date(o.dueDate + 'T00:00:00');
+  const diffDays = Math.round((due - today) / 86400000);
+  if(diffDays < 0) return { text: '⚠️ Atrasado ' + Math.abs(diffDays) + ' día' + (Math.abs(diffDays) === 1 ? '' : 's'), level: 'danger' };
+  if(diffDays === 0) return { text: '⚠️ Entrega hoy', level: 'danger' };
+  if(diffDays <= 2) return { text: '🗓️ Entrega en ' + diffDays + ' día' + (diffDays === 1 ? '' : 's'), level: 'warn' };
+  return null;
+}
+function countUrgentOrders(){
+  return loadOrders().filter(o => getOrderUrgency(o) !== null).length;
+}
+function updateOrdersUrgentBadge(){
+  const el = document.getElementById('orders-urgent-badge');
+  if(!el) return;
+  const n = countUrgentOrders();
+  el.textContent = n > 0 ? (' ⚠️' + n) : '';
+}
+
 function renderOrdersHome(){
   const list = document.getElementById('orders-list');
   const orders = loadOrders().sort((a, b) => b.createdAt - a.createdAt);
+  updateOrdersUrgentBadge();
   if(orders.length === 0){
     list.innerHTML = '<div class="empty-state"><div class="big">📋</div><p>Aún no tienes pedidos pendientes. Agrega uno para llevar el control de cada cliente.</p></div>';
     return;
@@ -1989,8 +2083,16 @@ function renderOrdersHome(){
     card.className = 'pattern-card';
     card.innerHTML =
       '<div class="thumb">' + (o.photo ? '<img src="' + o.photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">' : '📦') + '</div>' +
-      '<div class="info"><div class="name"></div><div class="meta"></div></div>' +
+      '<div class="info"><div class="order-alert"></div><div class="name"></div><div class="meta"></div></div>' +
       '<button class="del">✕</button>';
+    const urgency = getOrderUrgency(o);
+    const alertEl = card.querySelector('.order-alert');
+    if(urgency){
+      alertEl.textContent = urgency.text;
+      alertEl.className = 'order-alert ' + urgency.level;
+    } else {
+      alertEl.remove();
+    }
     card.querySelector('.name').textContent = o.client || 'Pedido sin nombre';
     let metaText = (o.status || 'Pendiente');
     if(o.dueDate) metaText += ' · Entrega: ' + o.dueDate;
@@ -2043,6 +2145,7 @@ function updateOrderBalance(){
   if(!currentOrder) return;
   const balance = (currentOrder.price || 0) - (currentOrder.deposit || 0);
   document.getElementById('order-balance').textContent = money(balance);
+  document.getElementById('btn-order-payment-reminder').style.display = (balance > 0) ? 'flex' : 'none';
 }
 
 function updateOrderStatusChips(){
@@ -2068,13 +2171,27 @@ function buildOrderWhatsappMessage(order){
   if(balance > 0) msg += ' Recuerda que falta ' + money(balance) + ' por cobrar.';
   return msg;
 }
+function buildPaymentReminderMessage(order){
+  const balance = (order.price || 0) - (order.deposit || 0);
+  let msg = 'Hola' + (order.client ? ' ' + order.client : '') + '! 🧶 Te recuerdo que tu pedido';
+  if(order.description) msg += ' (' + order.description.slice(0, 60) + ')';
+  msg += ' tiene un saldo pendiente de ' + money(balance) + '. ¿Cuándo te queda bien completarlo? 😊';
+  return msg;
+}
+function openOrderWhatsapp(order, text){
+  const encoded = encodeURIComponent(text);
+  let digits = (order.phone || '').replace(/\D/g, '');
+  if(digits.length === 10) digits = '52' + digits; // asume lada de México si son 10 dígitos
+  const url = digits ? ('https://wa.me/' + digits + '?text=' + encoded) : ('https://api.whatsapp.com/send?text=' + encoded);
+  window.open(url, '_blank');
+}
 document.getElementById('btn-order-whatsapp').addEventListener('click', () => {
   if(!currentOrder) return;
-  const text = encodeURIComponent(buildOrderWhatsappMessage(currentOrder));
-  let digits = (currentOrder.phone || '').replace(/\D/g, '');
-  if(digits.length === 10) digits = '52' + digits; // asume lada de México si son 10 dígitos
-  const url = digits ? ('https://wa.me/' + digits + '?text=' + text) : ('https://api.whatsapp.com/send?text=' + text);
-  window.open(url, '_blank');
+  openOrderWhatsapp(currentOrder, buildOrderWhatsappMessage(currentOrder));
+});
+document.getElementById('btn-order-payment-reminder').addEventListener('click', () => {
+  if(!currentOrder) return;
+  openOrderWhatsapp(currentOrder, buildPaymentReminderMessage(currentOrder));
 });
 
 document.getElementById('order-client-input').addEventListener('input', (e) => {
@@ -2666,6 +2783,236 @@ document.getElementById('btn-qr-delete').addEventListener('click', () => {
   currentQr = null;
   renderQrHome();
   showScreen('qr-home');
+});
+
+/* ---------------- Mensajes rápidos ---------------- */
+const MESSAGES_KEY = 'amigurumi_messages_v1';
+let currentMessage = null;
+
+function loadMessages(){
+  try{
+    const raw = localStorage.getItem(MESSAGES_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  const defaults = [
+    { id: uid(), name: 'Bienvenida', text: '¡Hola! Gracias por escribir a Riyan Store 🧶 ¿En qué puedo ayudarte hoy?', createdAt: Date.now() },
+    { id: uid(), name: 'Gracias por tu compra', text: '¡Gracias por tu compra! Espero que te encante tu amigurumi 💕 Cualquier duda, aquí estoy.', createdAt: Date.now() },
+    { id: uid(), name: 'Recordatorio de pago', text: 'Hola! Te recuerdo que tienes un saldo pendiente por tu pedido. ¿Cuándo te queda bien completarlo? 😊', createdAt: Date.now() },
+    { id: uid(), name: 'Pedido listo', text: '¡Tu pedido ya está listo! 🎉 ¿Cuándo gustas pasar por él o que te lo enviemos?', createdAt: Date.now() }
+  ];
+  saveMessages(defaults);
+  return defaults;
+}
+function saveMessages(list){
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(list));
+}
+function getMessage(id){
+  return loadMessages().find(m => m.id === id) || null;
+}
+function updateMessage(m){
+  const list = loadMessages();
+  const idx = list.findIndex(x => x.id === m.id);
+  if(idx >= 0) list[idx] = m; else list.push(m);
+  saveMessages(list);
+}
+function persistCurrentMessage(){
+  if(!currentMessage) return;
+  updateMessage(currentMessage);
+}
+
+document.getElementById('btn-open-messages').addEventListener('click', () => {
+  renderMessagesHome();
+  showScreen('messages-home');
+});
+document.getElementById('btn-messages-back-home').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function renderMessagesHome(){
+  const list = document.getElementById('messages-list');
+  const messages = loadMessages().sort((a, b) => b.createdAt - a.createdAt);
+  if(messages.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">💬</div><p>Aún no tienes mensajes guardados. Crea los que más uses para no escribirlos cada vez.</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  messages.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'pattern-card';
+    card.innerHTML =
+      '<div class="thumb">💬</div>' +
+      '<div class="info"><div class="name"></div><div class="meta"></div></div>' +
+      '<button class="del">✕</button>';
+    card.querySelector('.name').textContent = m.name || 'Mensaje sin nombre';
+    card.querySelector('.meta').textContent = (m.text || '').slice(0, 45) + ((m.text || '').length > 45 ? '…' : '');
+    card.addEventListener('click', (e) => {
+      if(e.target.closest('.del')) return;
+      openMessageDetail(m.id);
+    });
+    card.querySelector('.del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(confirm('¿Borrar este mensaje? No se puede deshacer.')){
+        saveMessages(loadMessages().filter(x => x.id !== m.id));
+        renderMessagesHome();
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('btn-new-message').addEventListener('click', () => {
+  const newMessage = { id: uid(), name: '', text: '', createdAt: Date.now() };
+  updateMessage(newMessage);
+  openMessageDetail(newMessage.id);
+});
+
+function openMessageDetail(id){
+  currentMessage = getMessage(id);
+  if(!currentMessage) return;
+  document.getElementById('message-name-input').value = currentMessage.name || '';
+  document.getElementById('message-text-input').value = currentMessage.text || '';
+  showScreen('message-detail');
+}
+
+document.getElementById('message-name-input').addEventListener('input', (e) => {
+  if(!currentMessage) return;
+  currentMessage.name = e.target.value;
+  persistCurrentMessage();
+});
+document.getElementById('message-text-input').addEventListener('input', (e) => {
+  if(!currentMessage) return;
+  currentMessage.text = e.target.value;
+  persistCurrentMessage();
+});
+
+document.getElementById('btn-message-whatsapp').addEventListener('click', () => {
+  if(!currentMessage) return;
+  const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(currentMessage.text || '');
+  window.open(url, '_blank');
+});
+document.getElementById('btn-message-copy').addEventListener('click', async () => {
+  if(!currentMessage) return;
+  try{
+    await navigator.clipboard.writeText(currentMessage.text || '');
+    const btn = document.getElementById('btn-message-copy');
+    const original = btn.textContent;
+    btn.textContent = '✅ Copiado';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  }catch(e){
+    alert('No se pudo copiar. Selecciona y copia el texto manualmente.');
+  }
+});
+
+document.getElementById('btn-message-detail-back').addEventListener('click', () => {
+  currentMessage = null;
+  renderMessagesHome();
+  showScreen('messages-home');
+});
+document.getElementById('btn-message-delete').addEventListener('click', () => {
+  if(!currentMessage) return;
+  if(!confirm('¿Borrar este mensaje? No se puede deshacer.')) return;
+  saveMessages(loadMessages().filter(m => m.id !== currentMessage.id));
+  currentMessage = null;
+  renderMessagesHome();
+  showScreen('messages-home');
+});
+
+/* ---------------- Respaldo de datos ---------------- */
+document.getElementById('btn-open-backup').addEventListener('click', () => {
+  document.getElementById('backup-status').textContent = '';
+  showScreen('backup');
+});
+document.getElementById('btn-backup-back').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function arrayBufferToBase64(buffer){
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  for(let i = 0; i < bytes.length; i += chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+function base64ToArrayBuffer(base64){
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i = 0; i < binary.length; i++){ bytes[i] = binary.charCodeAt(i); }
+  return bytes.buffer;
+}
+
+document.getElementById('btn-export-backup').addEventListener('click', async () => {
+  const statusEl = document.getElementById('backup-status');
+  statusEl.textContent = 'Preparando respaldo...';
+  try{
+    const patterns = await dbGetAll();
+    const patternsExport = patterns.map(p => ({
+      id: p.id, name: p.name, createdAt: p.createdAt,
+      pdfBase64: arrayBufferToBase64(p.pdfBuffer)
+    }));
+    const ls = {};
+    for(let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      ls[key] = localStorage.getItem(key);
+    }
+    const backup = {
+      version: 1,
+      app: 'Riyan Store - Patrones',
+      exportedAt: new Date().toISOString(),
+      localStorage: ls,
+      patterns: patternsExport
+    };
+    const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.download = 'respaldo-riyanstore-' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    statusEl.textContent = '✅ Respaldo descargado. Guárdalo en un lugar seguro (Drive, correo, etc.)';
+  }catch(e){
+    statusEl.textContent = '⚠️ No se pudo generar el respaldo. Intenta de nuevo.';
+  }
+});
+
+document.getElementById('btn-import-backup').addEventListener('click', () => {
+  if(!confirm('Esto va a REEMPLAZAR todo lo que tienes guardado ahora (patrones, pedidos, costeos, etc.) por lo que traiga el archivo de respaldo. ¿Quieres continuar?')) return;
+  document.getElementById('backup-file-input').click();
+});
+
+document.getElementById('backup-file-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const statusEl = document.getElementById('backup-status');
+  statusEl.textContent = 'Restaurando...';
+  try{
+    const text = await file.text();
+    const backup = JSON.parse(text);
+    if(!backup || !backup.localStorage){
+      statusEl.textContent = '⚠️ Este archivo no parece un respaldo válido.';
+      return;
+    }
+    localStorage.clear();
+    Object.keys(backup.localStorage).forEach(k => {
+      localStorage.setItem(k, backup.localStorage[k]);
+    });
+    const existing = await dbGetAll();
+    for(const p of existing){ await dbDelete(p.id); }
+    if(Array.isArray(backup.patterns)){
+      for(const p of backup.patterns){
+        await dbAdd({ id: p.id, name: p.name, createdAt: p.createdAt, pdfBuffer: base64ToArrayBuffer(p.pdfBase64) });
+      }
+    }
+    statusEl.textContent = '✅ Respaldo restaurado correctamente.';
+    renderHome();
+  }catch(e){
+    statusEl.textContent = '⚠️ No se pudo restaurar este archivo. Verifica que sea el respaldo correcto.';
+  }
 });
 
 /* ---------------- Init ---------------- */
