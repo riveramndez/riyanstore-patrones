@@ -628,6 +628,7 @@
       </div>
 
       <button class="add-counter-btn" id="btn-add-counter2">+ Agregar otro contador (ej. puntadas)</button>
+      <button class="add-counter-btn" id="btn-open-notes">📝 Notas del trabajo (aguja, hilo, etc.)</button>
 
       <div class="timer-row">
         <div>
@@ -1017,6 +1018,19 @@
 
 </div>
 
+<!-- MODAL: notas del trabajo -->
+<div class="modal-overlay" id="modal-notes">
+  <div class="modal-box">
+    <h3>Notas de este trabajo</h3>
+    <p class="warn">Anota lo que quieras recordar: aguja(s) usada(s), si combinaste tamaños en distintas partes, tipo de hilo, color, etc.</p>
+    <textarea id="input-notes" placeholder="Ej. Aguja 3mm para el cuerpo, 2.5mm para las orejas. Hilo algodón Ricorumi color coral." style="width:100%; box-sizing:border-box; min-height:130px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:12px 14px; font-size:15px; font-family:inherit;"></textarea>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="cancel" id="modal-notes-cancel">Cancelar</button>
+      <button class="confirm" id="modal-notes-confirm">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: editar tiempo manualmente -->
 <div class="modal-overlay" id="modal-edit-time">
   <div class="modal-box">
@@ -1150,7 +1164,8 @@ function defaultProgress(){
     page: 1, zoom: 1,
     vueltas: 0,
     hasCounter2: false, counter2Label: 'Contador 2', counter2: 0,
-    elapsedSeconds: 0
+    elapsedSeconds: 0,
+    notes: ''
   };
 }
 
@@ -1506,6 +1521,14 @@ function updateCounterUI(){
   document.getElementById('btn-add-counter2').style.display = currentProgress.hasCounter2 ? 'none' : 'block';
   document.getElementById('counter2-value').textContent = currentProgress.counter2;
   document.getElementById('counter2-label-text').textContent = currentProgress.counter2Label;
+  updateNotesButtonLabel();
+}
+function updateNotesButtonLabel(){
+  const btn = document.getElementById('btn-open-notes');
+  if(!btn) return;
+  btn.textContent = (currentProgress.notes && currentProgress.notes.trim())
+    ? '📝 Notas del trabajo ✓ (toca para ver/editar)'
+    : '📝 Notas del trabajo (aguja, hilo, etc.)';
 }
 
 document.querySelectorAll('[data-counter]').forEach(btn => {
@@ -1532,6 +1555,20 @@ document.getElementById('btn-add-counter2').addEventListener('click', () => {
   currentProgress.hasCounter2 = true;
   updateCounterUI();
   persistProgress();
+});
+
+document.getElementById('btn-open-notes').addEventListener('click', () => {
+  document.getElementById('input-notes').value = currentProgress.notes || '';
+  document.getElementById('modal-notes').classList.add('active');
+});
+document.getElementById('modal-notes-cancel').addEventListener('click', () => {
+  document.getElementById('modal-notes').classList.remove('active');
+});
+document.getElementById('modal-notes-confirm').addEventListener('click', () => {
+  currentProgress.notes = document.getElementById('input-notes').value;
+  updateNotesButtonLabel();
+  persistProgress();
+  document.getElementById('modal-notes').classList.remove('active');
 });
 
 document.getElementById('btn-remove-counter2').addEventListener('click', () => {
