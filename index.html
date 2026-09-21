@@ -443,6 +443,41 @@
     background:var(--surface); border:1px solid var(--border); color:var(--text);
     border-radius:12px; padding:12px 14px; font-size:15px; margin:14px 20px 12px;
   }
+  .list-search{
+    display:block; width:calc(100% - 40px); box-sizing:border-box;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    border-radius:12px; padding:11px 14px; font-size:14.5px; margin:8px 20px 10px;
+  }
+  .filter-chips-row{
+    display:flex; gap:8px; overflow-x:auto; padding:0 20px 10px;
+  }
+  .filter-chips-row .status-chip{ flex-shrink:0; white-space:nowrap; }
+  .catalog-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 20px 20px; }
+  .catalog-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .catalog-card .catalog-photo{
+    width:100%; aspect-ratio:1; background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center; font-size:30px;
+  }
+  .catalog-card .catalog-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .catalog-card .catalog-info{ padding:10px; }
+  .catalog-card .catalog-name{ font-size:13.5px; font-weight:600; margin-bottom:2px; }
+  .catalog-card .catalog-price{ font-family:var(--font-display); color:var(--accent); font-size:16px; font-weight:600; }
+  .sales-summary-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:18px; margin-bottom:16px; text-align:center;
+  }
+  .sales-summary-card .big-number{ font-family:var(--font-display); font-size:32px; font-weight:600; color:var(--accent); }
+  .sales-summary-card .sub{ color:var(--text-muted); font-size:13px; margin-top:4px; }
+  .month-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .month-card .month-name{ font-family:var(--font-display); font-weight:600; }
+  .month-card .month-sub{ color:var(--text-muted); font-size:12px; }
+  .month-card .month-total{ color:var(--accent-3); font-weight:600; }
   .ideas-list{ flex:1; padding:0 20px 20px; overflow-y:auto; }
   .idea-card{
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
@@ -565,6 +600,9 @@
     <button class="add-btn secondary costs-entry-btn" id="btn-open-costs"><span class="plus">🧮</span> Calculadora de costos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-orders"><span class="plus">📋</span> Pedidos pendientes<span id="orders-urgent-badge" style="color:var(--danger); font-weight:700;"></span></button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-ideas"><span class="plus">💡</span> Ideas para regalos</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-catalog"><span class="plus">🖼️</span> Catálogo para clientes</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-sales"><span class="plus">📊</span> Reporte de ventas</button>
+    <input type="text" class="list-search" id="pattern-search" placeholder="🔎 Buscar patrón...">
     <div class="pattern-list" id="pattern-list"></div>
     <input type="file" id="file-input" accept="application/pdf">
     <input type="file" id="camera-input" accept="image/*" capture="environment">
@@ -672,6 +710,7 @@
     </div>
     <div class="costs-list-wrap">
       <button class="add-btn" id="btn-new-cost" style="margin:16px 20px 8px;"><span class="plus">+</span> Nuevo producto</button>
+      <input type="text" class="list-search" id="costs-search" placeholder="🔎 Buscar producto...">
       <div class="pattern-list" id="costs-list"></div>
     </div>
   </div>
@@ -696,6 +735,10 @@
         </div>
         <input type="file" id="cost-photo-camera-input" accept="image/*" capture="environment" style="display:none;">
         <input type="file" id="cost-photo-input" accept="image/*" style="display:none;">
+        <div class="cost-row" style="margin-top:12px;">
+          <label>Mostrar en catálogo de clientes</label>
+          <button type="button" class="status-chip" id="toggle-catalog">⭐ En catálogo</button>
+        </div>
       </div>
 
       <div class="cost-section">
@@ -772,6 +815,14 @@
     </div>
     <div class="costs-list-wrap">
       <button class="add-btn" id="btn-new-order" style="margin:16px 20px 8px;"><span class="plus">+</span> Nuevo pedido</button>
+      <input type="text" class="list-search" id="orders-search" placeholder="🔎 Buscar cliente...">
+      <div class="filter-chips-row">
+        <button type="button" class="status-chip active" data-status-filter="Todos">Todos</button>
+        <button type="button" class="status-chip" data-status-filter="Pendiente">Pendiente</button>
+        <button type="button" class="status-chip" data-status-filter="En proceso">En proceso</button>
+        <button type="button" class="status-chip" data-status-filter="Listo">Listo</button>
+        <button type="button" class="status-chip" data-status-filter="Entregado">Entregado</button>
+      </div>
       <div class="pattern-list" id="orders-list"></div>
     </div>
   </div>
@@ -843,6 +894,7 @@
       </div>
 
       <button class="add-btn" id="btn-watermark-download" style="display:none;"><span class="plus">⬇️</span> Descargar imagen final</button>
+      <button class="add-btn secondary" id="btn-watermark-share" style="display:none; margin-top:10px;"><span class="plus">📲</span> Compartir (WhatsApp, etc.)</button>
     </div>
   </div>
 
@@ -936,6 +988,26 @@
       </div>
       <p class="scan-hint" id="backup-status" style="margin-top:6px;"></p>
     </div>
+  </div>
+
+  <!-- SALES REPORT SCREEN -->
+  <div id="sales-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-sales-back">‹</button>
+      <div class="viewer-title">Reporte de ventas</div>
+    </div>
+    <div class="cost-form" id="sales-content"></div>
+  </div>
+
+  <!-- CATALOG SCREEN -->
+  <div id="catalog-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-catalog-back">‹</button>
+      <div class="viewer-title">Catálogo para clientes</div>
+    </div>
+    <p class="scan-hint" style="margin:14px 20px 4px;">Marca "⭐ En catálogo" en tus productos costeados para que aparezcan aquí.</p>
+    <button class="add-btn" id="btn-catalog-share" style="margin:10px 20px; width:calc(100% - 40px); background:#25D366; color:#0b2b18;">📲 Compartir catálogo por WhatsApp</button>
+    <div class="catalog-grid" id="catalog-grid"></div>
   </div>
 
   <!-- ORDER DETAIL SCREEN -->
@@ -1182,20 +1254,30 @@ function showScreen(name){
 }
 
 /* ---------------- HOME: listar patrones ---------------- */
+let patternSearchQuery = '';
 async function renderHome(){
   stopTimerInterval();
   updateOrdersUrgentBadge();
   const list = document.getElementById('pattern-list');
-  const patterns = await dbGetAll();
+  let patterns = await dbGetAll();
   patterns.sort((a,b) => b.createdAt - a.createdAt);
+  const allPatternsEmpty = patterns.length === 0;
+  if(patternSearchQuery.trim()){
+    const q = normalizeText(patternSearchQuery);
+    patterns = patterns.filter(p => normalizeText(p.name).includes(q));
+  }
 
-  if(patterns.length === 0){
+  if(allPatternsEmpty){
     list.innerHTML = '';
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     const logoSrc = document.querySelector('.brand-logo').getAttribute('src');
     empty.innerHTML = '<img src="' + logoSrc + '" style="width:64px; margin-bottom:4px;"><p>Aún no tienes patrones guardados. Agrega un PDF para empezar a tejer con el contador a la mano.</p>';
     list.appendChild(empty);
+    return;
+  }
+  if(patterns.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🔎</div><p>No encontré ningún patrón con ese nombre.</p></div>';
     return;
   }
 
@@ -1747,12 +1829,26 @@ document.getElementById('btn-open-costs').addEventListener('click', () => {
 document.getElementById('btn-costs-back-home').addEventListener('click', () => {
   showScreen('home');
 });
+document.getElementById('costs-search').addEventListener('input', (e) => {
+  costsSearchQuery = e.target.value;
+  renderCostsHome();
+});
 
+let costsSearchQuery = '';
 function renderCostsHome(){
   const list = document.getElementById('costs-list');
-  const costs = loadCosts().sort((a, b) => b.createdAt - a.createdAt);
-  if(costs.length === 0){
+  const allCostsEmpty = loadCosts().length === 0;
+  let costs = loadCosts().sort((a, b) => b.createdAt - a.createdAt);
+  if(costsSearchQuery.trim()){
+    const q = normalizeText(costsSearchQuery);
+    costs = costs.filter(c => normalizeText(c.name || '').includes(q));
+  }
+  if(allCostsEmpty){
     list.innerHTML = '<div class="empty-state"><div class="big">🧮</div><p>Aún no tienes productos costeados. Crea uno para saber cuánto cobrar por cada pieza.</p></div>';
+    return;
+  }
+  if(costs.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🔎</div><p>No encontré ningún producto con ese nombre.</p></div>';
     return;
   }
   list.innerHTML = '';
@@ -1825,6 +1921,7 @@ function openCostDetail(id){
   document.getElementById('cost-hourly-rate').value = currentCost.hourlyRate || '';
   document.getElementById('cost-margin').value = currentCost.margin || 0;
   document.getElementById('cost-sell-price').value = currentCost.sellPrice || '';
+  document.getElementById('toggle-catalog').classList.toggle('active', !!currentCost.inCatalog);
 
   renderMaterials();
   renderExtras();
@@ -2005,18 +2102,27 @@ document.getElementById('cost-sell-price').addEventListener('input', (e) => {
   persistCurrentCost();
 });
 
+function getCostFinalPrice(cost){
+  const t = computeTotals(cost);
+  return (cost.sellPrice != null && cost.sellPrice > 0) ? cost.sellPrice : Math.ceil(t.price / 10) * 10;
+}
+
 document.getElementById('btn-cost-whatsapp').addEventListener('click', () => {
   if(!currentCost) return;
-  const t = computeTotals(currentCost);
-  const finalPrice = currentCost.sellPrice != null && currentCost.sellPrice > 0
-    ? currentCost.sellPrice
-    : Math.ceil(t.price / 10) * 10;
+  const finalPrice = getCostFinalPrice(currentCost);
   const productName = currentCost.name || 'tu pedido';
   let msg = '¡Hola! 🧶 Aquí tienes la cotización de *' + productName + '*:\n\n';
   msg += '💰 Precio: ' + money(finalPrice) + '\n\n';
   msg += '¿Deseas que continuemos con tu pedido?';
   const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
+});
+
+document.getElementById('toggle-catalog').addEventListener('click', () => {
+  if(!currentCost) return;
+  currentCost.inCatalog = !currentCost.inCatalog;
+  document.getElementById('toggle-catalog').classList.toggle('active', currentCost.inCatalog);
+  persistCurrentCost();
 });
 
 document.getElementById('cost-name-input').addEventListener('input', (e) => {
@@ -2084,6 +2190,18 @@ document.getElementById('btn-open-orders').addEventListener('click', () => {
 document.getElementById('btn-orders-back-home').addEventListener('click', () => {
   showScreen('home');
 });
+document.getElementById('orders-search').addEventListener('input', (e) => {
+  ordersSearchQuery = e.target.value;
+  renderOrdersHome();
+});
+document.querySelectorAll('.filter-chips-row [data-status-filter]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    ordersStatusFilter = chip.getAttribute('data-status-filter');
+    document.querySelectorAll('.filter-chips-row [data-status-filter]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    renderOrdersHome();
+  });
+});
 
 function getOrderUrgency(o){
   if(o.status === 'Entregado' || !o.dueDate) return null;
@@ -2105,12 +2223,26 @@ function updateOrdersUrgentBadge(){
   el.textContent = n > 0 ? (' ⚠️' + n) : '';
 }
 
+let ordersSearchQuery = '';
+let ordersStatusFilter = 'Todos';
 function renderOrdersHome(){
   const list = document.getElementById('orders-list');
-  const orders = loadOrders().sort((a, b) => b.createdAt - a.createdAt);
+  const allOrdersEmpty = loadOrders().length === 0;
+  let orders = loadOrders().sort((a, b) => b.createdAt - a.createdAt);
   updateOrdersUrgentBadge();
-  if(orders.length === 0){
+  if(ordersStatusFilter !== 'Todos'){
+    orders = orders.filter(o => (o.status || 'Pendiente') === ordersStatusFilter);
+  }
+  if(ordersSearchQuery.trim()){
+    const q = normalizeText(ordersSearchQuery);
+    orders = orders.filter(o => normalizeText(o.client || '').includes(q) || normalizeText(o.description || '').includes(q));
+  }
+  if(allOrdersEmpty){
     list.innerHTML = '<div class="empty-state"><div class="big">📋</div><p>Aún no tienes pedidos pendientes. Agrega uno para llevar el control de cada cliente.</p></div>';
+    return;
+  }
+  if(orders.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🔎</div><p>No encontré ningún pedido con ese filtro.</p></div>';
     return;
   }
   list.innerHTML = '';
@@ -2186,15 +2318,19 @@ function updateOrderBalance(){
 }
 
 function updateOrderStatusChips(){
-  document.querySelectorAll('.status-chip').forEach(chip => {
+  document.querySelectorAll('.status-chips [data-status]').forEach(chip => {
     chip.classList.toggle('active', chip.getAttribute('data-status') === (currentOrder.status || 'Pendiente'));
   });
   document.getElementById('btn-order-whatsapp').style.display = (currentOrder.status === 'Listo') ? 'flex' : 'none';
 }
-document.querySelectorAll('.status-chip').forEach(chip => {
+document.querySelectorAll('.status-chips [data-status]').forEach(chip => {
   chip.addEventListener('click', () => {
     if(!currentOrder) return;
+    const wasDelivered = currentOrder.status === 'Entregado';
     currentOrder.status = chip.getAttribute('data-status');
+    if(currentOrder.status === 'Entregado' && !wasDelivered && !currentOrder.deliveredAt){
+      currentOrder.deliveredAt = Date.now();
+    }
     updateOrderStatusChips();
     persistCurrentOrder();
   });
@@ -2382,6 +2518,11 @@ function getAllIdeaGroups(){
   return groups;
 }
 
+document.getElementById('pattern-search').addEventListener('input', (e) => {
+  patternSearchQuery = e.target.value;
+  renderHome();
+});
+
 document.getElementById('btn-open-ideas').addEventListener('click', () => {
   document.getElementById('idea-search').value = '';
   renderIdeas('');
@@ -2504,6 +2645,7 @@ document.getElementById('watermark-photo-input').addEventListener('change', (e) 
       wmState.photoImg = img;
       document.getElementById('watermark-preview-section').style.display = 'block';
       document.getElementById('btn-watermark-download').style.display = 'flex';
+      document.getElementById('btn-watermark-share').style.display = navigator.share ? 'flex' : 'none';
       document.getElementById('wm-tab-badge').click();
       renderWatermarkPreview();
     };
@@ -2640,7 +2782,7 @@ watermarkPreviewCanvasEl.addEventListener('pointermove', (e) => {
 });
 window.addEventListener('pointerup', () => { activeDragTarget = null; });
 
-document.getElementById('btn-watermark-download').addEventListener('click', () => {
+function generateWatermarkBlob(callback){
   if(!wmState.photoImg) return;
   const MAX_LONG_SIDE = 4000;
   let w = wmState.photoImg.naturalWidth;
@@ -2654,7 +2796,11 @@ document.getElementById('btn-watermark-download').addEventListener('click', () =
   outCanvas.width = w;
   outCanvas.height = h;
   drawWatermarkComposite(outCanvas.getContext('2d'), w, h);
-  outCanvas.toBlob((blob) => {
+  outCanvas.toBlob(callback, 'image/jpeg', 0.95);
+}
+
+document.getElementById('btn-watermark-download').addEventListener('click', () => {
+  generateWatermarkBlob((blob) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -2663,7 +2809,19 @@ document.getElementById('btn-watermark-download').addEventListener('click', () =
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-  }, 'image/jpeg', 0.95);
+  });
+});
+
+document.getElementById('btn-watermark-share').addEventListener('click', () => {
+  generateWatermarkBlob(async (blob) => {
+    const file = new File([blob], 'producto-marca-agua.jpg', { type: 'image/jpeg' });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{ await navigator.share({ files: [file] }); }
+      catch(e){ /* el usuario canceló, no pasa nada */ }
+    } else {
+      alert('Tu navegador no permite compartir directo. Usa "Descargar imagen final" y adjúntala en WhatsApp manualmente.');
+    }
+  });
 });
 
 /* ---------------- Generador de código QR ---------------- */
@@ -3050,6 +3208,106 @@ document.getElementById('backup-file-input').addEventListener('change', async (e
   }catch(e){
     statusEl.textContent = '⚠️ No se pudo restaurar este archivo. Verifica que sea el respaldo correcto.';
   }
+});
+
+/* ---------------- Reporte de ventas ---------------- */
+document.getElementById('btn-open-sales').addEventListener('click', () => {
+  renderSalesReport();
+  showScreen('sales-home');
+});
+document.getElementById('btn-sales-back').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function renderSalesReport(){
+  const content = document.getElementById('sales-content');
+  const delivered = loadOrders().filter(o => o.status === 'Entregado');
+
+  if(delivered.length === 0){
+    content.innerHTML = '<div class="empty-state"><div class="big">📊</div><p>Todavía no tienes pedidos marcados como "Entregado". En cuanto entregues alguno, aquí verás tu resumen de ventas.</p></div>';
+    return;
+  }
+
+  const totalGeneral = delivered.reduce((sum, o) => sum + (o.price || 0), 0);
+
+  const monthMap = {};
+  delivered.forEach(o => {
+    const ts = o.deliveredAt || o.createdAt;
+    const d = new Date(ts);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    if(!monthMap[key]) monthMap[key] = { total: 0, count: 0, year: d.getFullYear(), month: d.getMonth() };
+    monthMap[key].total += (o.price || 0);
+    monthMap[key].count += 1;
+  });
+
+  const monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const monthKeys = Object.keys(monthMap).sort().reverse();
+
+  let html = '<div class="sales-summary-card">' +
+    '<div class="big-number">' + money(totalGeneral) + '</div>' +
+    '<div class="sub">Total vendido · ' + delivered.length + ' pedido' + (delivered.length === 1 ? '' : 's') + ' entregado' + (delivered.length === 1 ? '' : 's') + '</div>' +
+    '</div>';
+
+  monthKeys.forEach(key => {
+    const m = monthMap[key];
+    const label = m.month === new Date().getMonth() && m.year === new Date().getFullYear()
+      ? 'Este mes'
+      : (monthNames[m.month].charAt(0).toUpperCase() + monthNames[m.month].slice(1) + ' ' + m.year);
+    html += '<div class="month-card">' +
+      '<div><div class="month-name">' + label + '</div><div class="month-sub">' + m.count + ' pedido' + (m.count === 1 ? '' : 's') + '</div></div>' +
+      '<div class="month-total">' + money(m.total) + '</div>' +
+      '</div>';
+  });
+
+  content.innerHTML = html;
+}
+
+/* ---------------- Catálogo para clientes ---------------- */
+document.getElementById('btn-open-catalog').addEventListener('click', () => {
+  renderCatalog();
+  showScreen('catalog-home');
+});
+document.getElementById('btn-catalog-back').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function renderCatalog(){
+  const grid = document.getElementById('catalog-grid');
+  const items = loadCosts().filter(c => c.inCatalog).sort((a, b) => b.createdAt - a.createdAt);
+  const shareBtn = document.getElementById('btn-catalog-share');
+
+  if(items.length === 0){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="big">🖼️</div><p>Aún no marcaste ningún producto para el catálogo. Ábrelo desde la Calculadora de costos y toca "⭐ En catálogo".</p></div>';
+    shareBtn.style.display = 'none';
+    return;
+  }
+  shareBtn.style.display = 'flex';
+
+  grid.innerHTML = '';
+  items.forEach(c => {
+    const price = getCostFinalPrice(c);
+    const card = document.createElement('div');
+    card.className = 'catalog-card';
+    card.innerHTML =
+      '<div class="catalog-photo">' + (c.photo ? '<img src="' + c.photo + '">' : '🧶') + '</div>' +
+      '<div class="catalog-info"><div class="catalog-name"></div><div class="catalog-price"></div></div>';
+    card.querySelector('.catalog-name').textContent = c.name || 'Producto';
+    card.querySelector('.catalog-price').textContent = money(price);
+    card.addEventListener('click', () => openCostDetail(c.id));
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('btn-catalog-share').addEventListener('click', () => {
+  const items = loadCosts().filter(c => c.inCatalog).sort((a, b) => b.createdAt - a.createdAt);
+  if(items.length === 0) return;
+  let msg = '🧶 *Catálogo Riyan Store* 🧶\n\n';
+  items.forEach(c => {
+    msg += '• ' + (c.name || 'Producto') + ' — ' + money(getCostFinalPrice(c)) + '\n';
+  });
+  msg += '\nEscríbeme para hacer tu pedido 💕';
+  const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
 });
 
 /* ---------------- Init ---------------- */
