@@ -438,6 +438,46 @@
     border:1px solid var(--border); color:var(--text-muted); font-size:16px;
   }
   .corner-btn.active{ background:var(--accent-3); color:#12241d; border-color:var(--accent-3); }
+  .reorder-btn{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted);
+    border-radius:6px; display:flex; align-items:center; justify-content:center;
+  }
+  .reorder-btn:disabled{ opacity:0.25; }
+  .resume-card{
+    margin:8px 20px 4px; background:var(--surface); border:1px solid var(--accent-3);
+    border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:12px;
+  }
+  .resume-card .resume-icon{ font-size:24px; flex-shrink:0; }
+  .resume-card .resume-info{ flex:1; min-width:0; }
+  .resume-card .resume-label{ font-size:11px; color:var(--accent-3); font-weight:600; text-transform:uppercase; letter-spacing:0.02em; }
+  .resume-card .resume-name{ font-family:var(--font-display); font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .resume-card .resume-meta{ color:var(--text-muted); font-size:12px; }
+  .resume-card .resume-arrow{ font-size:20px; color:var(--accent-3); flex-shrink:0; }
+  .calendar-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px 4px;
+  }
+  .calendar-month-label{ font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:capitalize; }
+  .calendar-weekdays{
+    display:grid; grid-template-columns:repeat(7,1fr); text-align:center;
+    color:var(--text-muted); font-size:11px; padding:10px 14px 4px;
+  }
+  .calendar-grid{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:0 14px 10px;
+  }
+  .calendar-day{
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:10px; font-size:13px; position:relative; background:var(--surface);
+    border:1px solid transparent;
+  }
+  .calendar-day.empty{ background:transparent; }
+  .calendar-day.today{ border-color:var(--accent-3); }
+  .calendar-day.selected{ background:var(--accent-3); color:#12241d; font-weight:600; }
+  .calendar-day .cal-dot{
+    width:5px; height:5px; border-radius:50%; background:var(--accent); margin-top:2px;
+  }
+  .calendar-day.selected .cal-dot{ background:#12241d; }
+  .calendar-day-list{ padding:10px 20px 30px; }
   .idea-search{
     display:block; width:calc(100% - 40px); box-sizing:border-box;
     background:var(--surface); border:1px solid var(--border); color:var(--text);
@@ -600,12 +640,14 @@
     <button class="add-btn secondary costs-entry-btn" id="btn-open-costs"><span class="plus">🧮</span> Calculadora de costos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-orders"><span class="plus">📋</span> Pedidos pendientes<span id="orders-urgent-badge" style="color:var(--danger); font-weight:700;"></span></button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-clients"><span class="plus">👥</span> Clientes</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-calendar"><span class="plus">📅</span> Calendario de entregas</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-ideas"><span class="plus">💡</span> Ideas para regalos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-catalog"><span class="plus">🖼️</span> Catálogo para clientes</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-sales"><span class="plus">📊</span> Reporte de ventas</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-business-notes"><span class="plus">📝</span> Notas del negocio</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-stats"><span class="plus">📈</span> Estadísticas de tejido</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-settings"><span class="plus">🏪</span> Configuración de mi tienda</button>
+    <div id="resume-card-wrap"></div>
     <input type="text" class="list-search" id="pattern-search" placeholder="🔎 Buscar patrón...">
     <div class="pattern-list" id="pattern-list"></div>
     <input type="file" id="file-input" accept="application/pdf">
@@ -671,6 +713,7 @@
 
       <button class="add-counter-btn" id="btn-add-counter2">+ Agregar otro contador (ej. puntadas)</button>
       <button class="add-counter-btn" id="btn-open-notes">📝 Notas del trabajo (aguja, hilo, etc.)</button>
+      <button class="add-counter-btn" id="btn-open-estimate">⏱️ Tiempo estimado (opcional)</button>
 
       <div class="timer-row">
         <div>
@@ -723,6 +766,7 @@
     <div class="viewer-top">
       <button class="icon-btn" id="btn-cost-detail-back">‹</button>
       <input type="text" id="cost-name-input" class="cost-name-input" placeholder="Nombre del producto">
+      <button class="icon-btn" id="btn-cost-duplicate">⧉</button>
       <button class="icon-btn" id="btn-cost-delete" style="color:var(--danger);">🗑</button>
     </div>
     <div class="cost-form">
@@ -999,6 +1043,7 @@
       <button class="icon-btn" id="btn-sales-back">‹</button>
       <div class="viewer-title">Reporte de ventas</div>
     </div>
+    <button class="add-btn secondary" id="btn-sales-share" style="margin:14px 20px 0; width:calc(100% - 40px); display:none;">📲 Compartir resumen</button>
     <div class="cost-form" id="sales-content"></div>
   </div>
 
@@ -1072,11 +1117,30 @@
     </div>
   </div>
 
+  <!-- CALENDAR SCREEN -->
+  <div id="calendar-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-calendar-back">‹</button>
+      <div class="viewer-title">Calendario de entregas</div>
+    </div>
+    <div class="calendar-nav">
+      <button class="icon-btn" id="btn-calendar-prev">‹</button>
+      <div class="calendar-month-label" id="calendar-month-label"></div>
+      <button class="icon-btn" id="btn-calendar-next">›</button>
+    </div>
+    <div class="calendar-weekdays">
+      <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+    <div class="calendar-day-list" id="calendar-day-list"></div>
+  </div>
+
   <!-- ORDER DETAIL SCREEN -->
   <div id="order-detail" class="screen">
     <div class="viewer-top">
       <button class="icon-btn" id="btn-order-detail-back">‹</button>
       <input type="text" id="order-client-input" class="cost-name-input" placeholder="Nombre del cliente">
+      <button class="icon-btn" id="btn-order-duplicate">⧉</button>
       <button class="icon-btn" id="btn-order-delete" style="color:var(--danger);">🗑</button>
     </div>
     <div class="cost-form">
@@ -1132,6 +1196,14 @@
       </div>
 
       <div class="cost-section">
+        <div class="cost-section-title">Patrón de este pedido</div>
+        <select id="order-pattern-select" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:11px 12px; font-size:14.5px;">
+          <option value="">Ninguno</option>
+        </select>
+        <button class="add-counter-btn" id="btn-order-open-pattern" style="display:none; margin-top:8px;">📄 Abrir este patrón</button>
+      </div>
+
+      <div class="cost-section">
         <div class="cost-section-title">Estado</div>
         <div class="status-chips">
           <button type="button" class="status-chip" data-status="Pendiente">Pendiente</button>
@@ -1141,6 +1213,8 @@
         </div>
         <button class="add-btn" id="btn-order-whatsapp" style="display:none; margin-top:14px; background:#25D366; color:#0b2b18;">📲 Avisar que está listo (WhatsApp)</button>
         <button class="add-btn" id="btn-order-payment-reminder" style="display:none; margin-top:10px; background:var(--surface); color:var(--text); border:1px solid var(--border);">💰 Recordar saldo pendiente (WhatsApp)</button>
+        <button class="add-btn secondary" id="btn-order-receipt" style="margin-top:10px;">🧾 Generar recibo (PDF)</button>
+        <button class="add-btn secondary" id="btn-order-receipt-share" style="margin-top:10px;">📲 Compartir recibo</button>
       </div>
 
       <div class="cost-section">
@@ -1150,6 +1224,19 @@
     </div>
   </div>
 
+</div>
+
+<!-- MODAL: tiempo estimado -->
+<div class="modal-overlay" id="modal-estimate">
+  <div class="modal-box">
+    <h3>Tiempo estimado</h3>
+    <p class="warn">¿Cuántas horas crees que te toma tejer este patrón? Te sirve para planear tus entregas.</p>
+    <input type="number" inputmode="decimal" id="input-estimate" min="0" step="0.5" placeholder="Ej. 4" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:12px 14px; font-size:16px;">
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="cancel" id="modal-estimate-cancel">Cancelar</button>
+      <button class="confirm" id="modal-estimate-confirm">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: notas del trabajo -->
@@ -1299,8 +1386,48 @@ function defaultProgress(){
     vueltas: 0,
     hasCounter2: false, counter2Label: 'Contador 2', counter2: 0,
     elapsedSeconds: 0,
-    notes: ''
+    notes: '',
+    estimatedHours: null
   };
+}
+
+function renderResumeCard(patterns){
+  const wrap = document.getElementById('resume-card-wrap');
+  let best = null;
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if(!key || key.indexOf('progress_') !== 0) continue;
+    let prog;
+    try{ prog = JSON.parse(localStorage.getItem(key)); }catch(e){ continue; }
+    if(!prog || !prog.updatedAt) continue;
+    if(!best || prog.updatedAt > best.updatedAt){
+      best = { id: key.slice('progress_'.length), prog };
+    }
+  }
+  if(!best){ wrap.innerHTML = ''; return; }
+
+  const isFree = best.id === 'free';
+  const patternRecord = isFree ? null : patterns.find(p => p.id === best.id);
+  if(!isFree && !patternRecord){ wrap.innerHTML = ''; return; } // el patrón fue borrado
+
+  const name = isFree ? 'Contador libre' : patternRecord.name;
+  const meta = 'Vuelta ' + (best.prog.vueltas || 0) + ' · ' + formatTime(best.prog.elapsedSeconds || 0);
+
+  wrap.innerHTML =
+    '<div class="resume-card" id="resume-card-btn">' +
+      '<div class="resume-icon">' + (isFree ? '🧵' : '📄') + '</div>' +
+      '<div class="resume-info">' +
+        '<div class="resume-label">Retomar</div>' +
+        '<div class="resume-name"></div>' +
+        '<div class="resume-meta"></div>' +
+      '</div>' +
+      '<div class="resume-arrow">›</div>' +
+    '</div>';
+  wrap.querySelector('.resume-name').textContent = name;
+  wrap.querySelector('.resume-meta').textContent = meta;
+  document.getElementById('resume-card-btn').addEventListener('click', () => {
+    if(isFree) openFreeSession(); else openPattern(best.id);
+  });
 }
 
 /* ---------------- Estado global ---------------- */
@@ -1323,6 +1450,7 @@ async function renderHome(){
   const list = document.getElementById('pattern-list');
   let patterns = await dbGetAll();
   patterns.sort((a,b) => b.createdAt - a.createdAt);
+  renderResumeCard(patterns);
   const allPatternsEmpty = patterns.length === 0;
   if(patternSearchQuery.trim()){
     const q = normalizeText(patternSearchQuery);
@@ -1666,6 +1794,7 @@ function updateCounterUI(){
   document.getElementById('counter2-value').textContent = currentProgress.counter2;
   document.getElementById('counter2-label-text').textContent = currentProgress.counter2Label;
   updateNotesButtonLabel();
+  updateEstimateButtonLabel();
 }
 function updateNotesButtonLabel(){
   const btn = document.getElementById('btn-open-notes');
@@ -1673,6 +1802,14 @@ function updateNotesButtonLabel(){
   btn.textContent = (currentProgress.notes && currentProgress.notes.trim())
     ? '📝 Notas del trabajo ✓ (toca para ver/editar)'
     : '📝 Notas del trabajo (aguja, hilo, etc.)';
+}
+function updateEstimateButtonLabel(){
+  const btn = document.getElementById('btn-open-estimate');
+  if(!btn) return;
+  const hours = currentProgress.estimatedHours;
+  btn.textContent = (hours != null && hours > 0)
+    ? '⏱️ Tiempo estimado: ' + hours + ' h (toca para editar)'
+    : '⏱️ Tiempo estimado (opcional)';
 }
 
 document.querySelectorAll('[data-counter]').forEach(btn => {
@@ -1713,6 +1850,21 @@ document.getElementById('modal-notes-confirm').addEventListener('click', () => {
   updateNotesButtonLabel();
   persistProgress();
   document.getElementById('modal-notes').classList.remove('active');
+});
+
+document.getElementById('btn-open-estimate').addEventListener('click', () => {
+  document.getElementById('input-estimate').value = currentProgress.estimatedHours || '';
+  document.getElementById('modal-estimate').classList.add('active');
+});
+document.getElementById('modal-estimate-cancel').addEventListener('click', () => {
+  document.getElementById('modal-estimate').classList.remove('active');
+});
+document.getElementById('modal-estimate-confirm').addEventListener('click', () => {
+  const v = parseFloat(document.getElementById('input-estimate').value);
+  currentProgress.estimatedHours = (isNaN(v) || v <= 0) ? null : v;
+  updateEstimateButtonLabel();
+  persistProgress();
+  document.getElementById('modal-estimate').classList.remove('active');
 });
 
 document.getElementById('btn-remove-counter2').addEventListener('click', () => {
@@ -1792,6 +1944,7 @@ document.getElementById('modal-edit-time-confirm').addEventListener('click', () 
 /* ---------------- Persistencia de progreso ---------------- */
 function persistProgress(){
   if(!currentPatternId || !currentProgress) return;
+  currentProgress.updatedAt = Date.now();
   saveProgress(currentPatternId, currentProgress);
 }
 window.addEventListener('beforeunload', persistProgress);
@@ -2211,6 +2364,17 @@ document.getElementById('btn-cost-delete').addEventListener('click', () => {
   renderCostsHome();
   showScreen('costs-home');
 });
+document.getElementById('btn-cost-duplicate').addEventListener('click', () => {
+  if(!currentCost) return;
+  const copy = JSON.parse(JSON.stringify(currentCost));
+  copy.id = uid();
+  copy.createdAt = Date.now();
+  copy.name = (currentCost.name || 'Producto') + ' (copia)';
+  copy.materials = (copy.materials || []).map(m => ({ ...m, id: uid() }));
+  copy.extras = (copy.extras || []).map(x => ({ ...x, id: uid() }));
+  updateCost(copy);
+  openCostDetail(copy.id);
+});
 
 /* ---------------- Pedidos pendientes ---------------- */
 const ORDERS_KEY = 'amigurumi_orders_v1';
@@ -2280,12 +2444,38 @@ function updateOrdersUrgentBadge(){
   el.textContent = n > 0 ? (' ⚠️' + n) : '';
 }
 
+function ensureOrdersSortOrder(){
+  const list = loadOrders();
+  const missing = list.filter(o => o.sortOrder === undefined || o.sortOrder === null);
+  if(missing.length > 0){
+    const sorted = [...list].sort((a, b) => b.createdAt - a.createdAt);
+    sorted.forEach((o, i) => { o.sortOrder = i; });
+    saveOrders(sorted);
+  }
+}
+function getOrdersSorted(){
+  ensureOrdersSortOrder();
+  return loadOrders().sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+}
+function moveOrder(id, direction){
+  const list = getOrdersSorted();
+  const idx = list.findIndex(o => o.id === id);
+  const swapIdx = idx + direction;
+  if(idx === -1 || swapIdx < 0 || swapIdx >= list.length) return;
+  const tmp = list[idx].sortOrder;
+  list[idx].sortOrder = list[swapIdx].sortOrder;
+  list[swapIdx].sortOrder = tmp;
+  saveOrders(list);
+  renderOrdersHome();
+}
+
 let ordersSearchQuery = '';
 let ordersStatusFilter = 'Todos';
 function renderOrdersHome(){
   const list = document.getElementById('orders-list');
   const allOrdersEmpty = loadOrders().length === 0;
-  let orders = loadOrders().sort((a, b) => b.createdAt - a.createdAt);
+  let orders = getOrdersSorted();
+  const canReorder = ordersStatusFilter === 'Todos' && !ordersSearchQuery.trim();
   updateOrdersUrgentBadge();
   if(ordersStatusFilter !== 'Todos'){
     orders = orders.filter(o => (o.status || 'Pendiente') === ordersStatusFilter);
@@ -2302,14 +2492,27 @@ function renderOrdersHome(){
     list.innerHTML = '<div class="empty-state"><div class="big">🔎</div><p>No encontré ningún pedido con ese filtro.</p></div>';
     return;
   }
-  list.innerHTML = '';
-  orders.forEach(o => {
+  if(canReorder){
+    const hint = document.createElement('p');
+    hint.className = 'scan-hint';
+    hint.style.margin = '0 0 8px';
+    hint.textContent = 'Usa ▲▼ para priorizar cuál pedido atiendes primero.';
+    list.innerHTML = '';
+    list.appendChild(hint);
+  } else {
+    list.innerHTML = '';
+  }
+  orders.forEach((o, idx) => {
     const balance = (o.price || 0) - (o.deposit || 0);
     const card = document.createElement('div');
     card.className = 'pattern-card';
     card.innerHTML =
       '<div class="thumb">' + (o.photo ? '<img src="' + o.photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">' : '📦') + '</div>' +
       '<div class="info"><div class="order-alert"></div><div class="name"></div><div class="meta"></div></div>' +
+      (canReorder ? '<div style="display:flex;flex-direction:column;gap:2px;">' +
+        '<button class="reorder-btn move-up" style="width:26px;height:26px;font-size:11px;">▲</button>' +
+        '<button class="reorder-btn move-down" style="width:26px;height:26px;font-size:11px;">▼</button>' +
+      '</div>' : '') +
       '<button class="del">✕</button>';
     const urgency = getOrderUrgency(o);
     const alertEl = card.querySelector('.order-alert');
@@ -2325,9 +2528,17 @@ function renderOrdersHome(){
     if(balance > 0) metaText += ' · Falta $' + balance.toFixed(2);
     card.querySelector('.meta').textContent = metaText;
     card.addEventListener('click', (e) => {
-      if(e.target.closest('.del')) return;
+      if(e.target.closest('.del') || e.target.closest('.reorder-btn')) return;
       openOrderDetail(o.id);
     });
+    if(canReorder){
+      const upBtn = card.querySelector('.move-up');
+      const downBtn = card.querySelector('.move-down');
+      if(idx === 0) upBtn.disabled = true;
+      if(idx === orders.length - 1) downBtn.disabled = true;
+      upBtn.addEventListener('click', (e) => { e.stopPropagation(); moveOrder(o.id, -1); });
+      downBtn.addEventListener('click', (e) => { e.stopPropagation(); moveOrder(o.id, 1); });
+    }
     card.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation();
       if(confirm('¿Borrar este pedido? No se puede deshacer.')){
@@ -2340,16 +2551,18 @@ function renderOrdersHome(){
 }
 
 document.getElementById('btn-new-order').addEventListener('click', () => {
+  const existing = loadOrders();
+  const maxSort = existing.reduce((max, o) => Math.max(max, o.sortOrder || 0), -1);
   const newOrder = {
     id: uid(), client: '', createdAt: Date.now(),
     photo: null, description: '', phone: '', price: 0, deposit: 0,
-    dueDate: '', status: 'Pendiente', notes: ''
+    dueDate: '', status: 'Pendiente', notes: '', sortOrder: maxSort + 1
   };
   updateOrder(newOrder);
   openOrderDetail(newOrder.id);
 });
 
-function openOrderDetail(id){
+async function openOrderDetail(id){
   currentOrder = getOrder(id);
   if(!currentOrder) return;
 
@@ -2361,10 +2574,27 @@ function openOrderDetail(id){
   document.getElementById('order-due-date').value = currentOrder.dueDate || '';
   document.getElementById('order-notes').value = currentOrder.notes || '';
 
+  await populateOrderPatternSelect();
+
   renderOrderPhotoPreview();
   updateOrderStatusChips();
   updateOrderBalance();
   showScreen('order-detail');
+}
+
+async function populateOrderPatternSelect(){
+  const select = document.getElementById('order-pattern-select');
+  const patterns = await dbGetAll();
+  patterns.sort((a, b) => b.createdAt - a.createdAt);
+  select.innerHTML = '<option value="">Ninguno</option>';
+  patterns.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    select.appendChild(opt);
+  });
+  select.value = currentOrder.patternId || '';
+  document.getElementById('btn-order-open-pattern').style.display = currentOrder.patternId ? 'block' : 'none';
 }
 
 function updateOrderBalance(){
@@ -2424,6 +2654,98 @@ document.getElementById('btn-order-payment-reminder').addEventListener('click', 
   openOrderWhatsapp(currentOrder, buildPaymentReminderMessage(currentOrder));
 });
 
+function buildOrderReceiptDoc(order){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const marginX = 50;
+  let y = 60;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text(getStoreName(), marginX, y);
+  y += 20;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text('WhatsApp: ' + getStorePhoneDisplay(), marginX, y);
+  y += 30;
+
+  doc.setDrawColor(200);
+  doc.line(marginX, y, 562, y);
+  y += 30;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text('Recibo de pedido', marginX, y);
+  y += 28;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  const fecha = new Date(order.createdAt).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+  doc.text('Fecha del pedido: ' + fecha, marginX, y); y += 18;
+  if(order.dueDate){
+    doc.text('Fecha de entrega: ' + order.dueDate, marginX, y); y += 18;
+  }
+  y += 10;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Cliente', marginX, y); y += 16;
+  doc.setFont('helvetica', 'normal');
+  doc.text(order.client || 'Sin nombre', marginX, y); y += 16;
+  if(order.phone){ doc.text('Tel: ' + order.phone, marginX, y); y += 16; }
+  y += 10;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Producto', marginX, y); y += 16;
+  doc.setFont('helvetica', 'normal');
+  const descLines = doc.splitTextToSize(order.description || 'Sin descripción', 500);
+  doc.text(descLines, marginX, y);
+  y += descLines.length * 14 + 20;
+
+  doc.setDrawColor(200);
+  doc.line(marginX, y, 562, y);
+  y += 24;
+
+  const balance = (order.price || 0) - (order.deposit || 0);
+  doc.setFontSize(12);
+  doc.text('Precio total:', marginX, y);
+  doc.text(money(order.price || 0), 480, y, { align: 'right' }); y += 20;
+  doc.text('Anticipo recibido:', marginX, y);
+  doc.text(money(order.deposit || 0), 480, y, { align: 'right' }); y += 20;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Saldo pendiente:', marginX, y);
+  doc.text(money(balance), 480, y, { align: 'right' }); y += 34;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(120);
+  doc.text('¡Gracias por tu compra! 🧶', marginX, y);
+
+  return doc;
+}
+function getOrderReceiptFilename(order){
+  const safeName = (order.client || 'pedido').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'pedido';
+  return 'recibo-' + safeName + '.pdf';
+}
+
+document.getElementById('btn-order-receipt').addEventListener('click', () => {
+  if(!currentOrder) return;
+  const doc = buildOrderReceiptDoc(currentOrder);
+  doc.save(getOrderReceiptFilename(currentOrder));
+});
+
+document.getElementById('btn-order-receipt-share').addEventListener('click', async () => {
+  if(!currentOrder) return;
+  const doc = buildOrderReceiptDoc(currentOrder);
+  const blob = doc.output('blob');
+  const file = new File([blob], getOrderReceiptFilename(currentOrder), { type: 'application/pdf' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    try{ await navigator.share({ files: [file] }); }
+    catch(e){ /* cancelado */ }
+  } else {
+    alert('Tu navegador no permite compartir directo. Usa "Generar recibo (PDF)" y adjúntalo en WhatsApp manualmente.');
+  }
+});
+
 document.getElementById('order-client-input').addEventListener('input', (e) => {
   if(!currentOrder) return;
   currentOrder.client = e.target.value;
@@ -2448,6 +2770,16 @@ document.getElementById('order-due-date').addEventListener('input', (e) => {
   if(!currentOrder) return;
   currentOrder.dueDate = e.target.value;
   persistCurrentOrder();
+});
+document.getElementById('order-pattern-select').addEventListener('change', (e) => {
+  if(!currentOrder) return;
+  currentOrder.patternId = e.target.value || null;
+  document.getElementById('btn-order-open-pattern').style.display = currentOrder.patternId ? 'block' : 'none';
+  persistCurrentOrder();
+});
+document.getElementById('btn-order-open-pattern').addEventListener('click', () => {
+  if(!currentOrder || !currentOrder.patternId) return;
+  openPattern(currentOrder.patternId);
 });
 ['order-price', 'order-deposit'].forEach(fieldId => {
   document.getElementById(fieldId).addEventListener('input', () => {
@@ -2511,6 +2843,21 @@ document.getElementById('btn-order-delete').addEventListener('click', () => {
   currentOrder = null;
   renderOrdersHome();
   showScreen('orders-home');
+});
+document.getElementById('btn-order-duplicate').addEventListener('click', () => {
+  if(!currentOrder) return;
+  const existing = loadOrders();
+  const maxSort = existing.reduce((max, o) => Math.max(max, o.sortOrder || 0), -1);
+  const copy = JSON.parse(JSON.stringify(currentOrder));
+  copy.id = uid();
+  copy.createdAt = Date.now();
+  copy.status = 'Pendiente';
+  copy.deliveredAt = null;
+  copy.deposit = 0;
+  copy.dueDate = '';
+  copy.sortOrder = maxSort + 1;
+  updateOrder(copy);
+  openOrderDetail(copy.id);
 });
 
 /* ---------------- Ideas para regalos ---------------- */
@@ -3276,14 +3623,19 @@ document.getElementById('btn-sales-back').addEventListener('click', () => {
   showScreen('home');
 });
 
+let salesReportSummary = null;
 function renderSalesReport(){
   const content = document.getElementById('sales-content');
+  const shareBtn = document.getElementById('btn-sales-share');
   const delivered = loadOrders().filter(o => o.status === 'Entregado');
 
   if(delivered.length === 0){
     content.innerHTML = '<div class="empty-state"><div class="big">📊</div><p>Todavía no tienes pedidos marcados como "Entregado". En cuanto entregues alguno, aquí verás tu resumen de ventas.</p></div>';
+    shareBtn.style.display = 'none';
+    salesReportSummary = null;
     return;
   }
+  shareBtn.style.display = 'flex';
 
   const totalGeneral = delivered.reduce((sum, o) => sum + (o.price || 0), 0);
 
@@ -3305,6 +3657,8 @@ function renderSalesReport(){
     '<div class="sub">Total vendido · ' + delivered.length + ' pedido' + (delivered.length === 1 ? '' : 's') + ' entregado' + (delivered.length === 1 ? '' : 's') + '</div>' +
     '</div>';
 
+  salesReportSummary = { totalGeneral, count: delivered.length, lines: [] };
+
   monthKeys.forEach(key => {
     const m = monthMap[key];
     const label = m.month === new Date().getMonth() && m.year === new Date().getFullYear()
@@ -3314,10 +3668,19 @@ function renderSalesReport(){
       '<div><div class="month-name">' + label + '</div><div class="month-sub">' + m.count + ' pedido' + (m.count === 1 ? '' : 's') + '</div></div>' +
       '<div class="month-total">' + money(m.total) + '</div>' +
       '</div>';
+    salesReportSummary.lines.push(label + ': ' + money(m.total) + ' (' + m.count + ' pedido' + (m.count === 1 ? '' : 's') + ')');
   });
 
   content.innerHTML = html;
 }
+document.getElementById('btn-sales-share').addEventListener('click', () => {
+  if(!salesReportSummary) return;
+  let msg = '📊 *Reporte de ventas — ' + getStoreName() + '*\n\n';
+  msg += 'Total vendido: ' + money(salesReportSummary.totalGeneral) + ' (' + salesReportSummary.count + ' pedidos)\n\n';
+  msg += salesReportSummary.lines.join('\n');
+  const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+});
 
 /* ---------------- Catálogo para clientes ---------------- */
 document.getElementById('btn-open-catalog').addEventListener('click', () => {
@@ -3604,6 +3967,107 @@ document.getElementById('btn-save-settings').addEventListener('click', () => {
   applyStoreBranding();
   document.getElementById('settings-status').textContent = '✅ Guardado.';
 });
+
+/* ---------------- Calendario de entregas ---------------- */
+let calendarViewYear, calendarViewMonth;
+let calendarSelectedDateStr = null;
+
+document.getElementById('btn-open-calendar').addEventListener('click', () => {
+  const today = new Date();
+  calendarViewYear = today.getFullYear();
+  calendarViewMonth = today.getMonth();
+  calendarSelectedDateStr = formatDateLocal(today);
+  renderCalendar();
+  showScreen('calendar-home');
+});
+document.getElementById('btn-calendar-back').addEventListener('click', () => {
+  showScreen('home');
+});
+document.getElementById('btn-calendar-prev').addEventListener('click', () => {
+  calendarViewMonth--;
+  if(calendarViewMonth < 0){ calendarViewMonth = 11; calendarViewYear--; }
+  renderCalendar();
+});
+document.getElementById('btn-calendar-next').addEventListener('click', () => {
+  calendarViewMonth++;
+  if(calendarViewMonth > 11){ calendarViewMonth = 0; calendarViewYear++; }
+  renderCalendar();
+});
+
+function formatDateLocal(d){
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function getOrdersByDueDate(){
+  const map = {};
+  loadOrders().forEach(o => {
+    if(!o.dueDate) return;
+    if(!map[o.dueDate]) map[o.dueDate] = [];
+    map[o.dueDate].push(o);
+  });
+  return map;
+}
+
+const CALENDAR_MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function renderCalendar(){
+  document.getElementById('calendar-month-label').textContent = CALENDAR_MONTH_NAMES[calendarViewMonth] + ' ' + calendarViewYear;
+  const grid = document.getElementById('calendar-grid');
+  grid.innerHTML = '';
+
+  const ordersByDate = getOrdersByDueDate();
+  const todayStr = formatDateLocal(new Date());
+  const firstDayOfWeek = new Date(calendarViewYear, calendarViewMonth, 1).getDay();
+  const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
+
+  for(let i = 0; i < firstDayOfWeek; i++){
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day empty';
+    grid.appendChild(empty);
+  }
+  for(let day = 1; day <= daysInMonth; day++){
+    const dateStr = calendarViewYear + '-' + String(calendarViewMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day';
+    if(dateStr === todayStr) cell.classList.add('today');
+    if(dateStr === calendarSelectedDateStr) cell.classList.add('selected');
+    const hasOrders = ordersByDate[dateStr] && ordersByDate[dateStr].length > 0;
+    cell.innerHTML = '<span>' + day + '</span>' + (hasOrders ? '<span class="cal-dot"></span>' : '');
+    cell.addEventListener('click', () => {
+      calendarSelectedDateStr = dateStr;
+      renderCalendar();
+    });
+    grid.appendChild(cell);
+  }
+
+  renderCalendarDayList(ordersByDate);
+}
+
+function renderCalendarDayList(ordersByDate){
+  const list = document.getElementById('calendar-day-list');
+  if(!calendarSelectedDateStr){ list.innerHTML = ''; return; }
+  const orders = (ordersByDate || getOrdersByDueDate())[calendarSelectedDateStr] || [];
+  const d = new Date(calendarSelectedDateStr + 'T00:00:00');
+  const label = d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  if(orders.length === 0){
+    list.innerHTML = '<p class="scan-hint">Sin entregas para el ' + label + '.</p>';
+    return;
+  }
+  let html = '<p class="scan-hint" style="text-transform:capitalize;">Entregas del ' + label + ':</p>';
+  list.innerHTML = html;
+  orders.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'pattern-card';
+    card.innerHTML =
+      '<div class="thumb">' + (o.photo ? '<img src="' + o.photo + '" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">' : '📦') + '</div>' +
+      '<div class="info"><div class="name"></div><div class="meta"></div></div>';
+    card.querySelector('.name').textContent = o.client || 'Pedido sin nombre';
+    card.querySelector('.meta').textContent = (o.status || 'Pendiente');
+    card.addEventListener('click', () => openOrderDetail(o.id));
+    list.appendChild(card);
+  });
+}
 
 /* ---------------- Init ---------------- */
 applyStoreBranding();
