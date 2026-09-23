@@ -634,6 +634,7 @@
     </div>
     <button class="add-btn secondary costs-entry-btn" id="btn-free-counter"><span class="plus">🧵</span> Contador libre (sin patrón)</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-watermark"><span class="plus">🖼️</span> Marca de agua en fotos</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-compress"><span class="plus">🗜️</span> Comprimir foto</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-qr"><span class="plus">🔗</span> Generador de código QR</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-messages"><span class="plus">💬</span> Mensajes rápidos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-backup"><span class="plus">⚙️</span> Respaldo de mis datos</button>
@@ -785,6 +786,17 @@
         <div class="cost-row" style="margin-top:12px;">
           <label>Mostrar en catálogo de clientes</label>
           <button type="button" class="status-chip" id="toggle-catalog">⭐ En catálogo</button>
+        </div>
+        <div id="catalog-feed-fields" style="display:none; margin-top:10px;">
+          <p class="scan-hint" style="margin:0 0 8px;">Para exportarlo a Facebook/TikTok necesitas la URL pública de la foto (súbela a tu bucket de Supabase y pega aquí el link).</p>
+          <div class="cost-row">
+            <label>URL de la foto (pública)</label>
+          </div>
+          <input type="text" id="cost-catalog-image-url" placeholder="https://...supabase.co/.../foto.jpg" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+          <div class="cost-row">
+            <label>Descripción (opcional)</label>
+          </div>
+          <textarea id="cost-catalog-description" placeholder="Ej. Amigurumi tejido a mano, aprox. 12 cm" style="min-height:56px;"></textarea>
         </div>
       </div>
 
@@ -1055,6 +1067,8 @@
     </div>
     <p class="scan-hint" style="margin:14px 20px 4px;">Marca "⭐ En catálogo" en tus productos costeados para que aparezcan aquí.</p>
     <button class="add-btn" id="btn-catalog-share" style="margin:10px 20px; width:calc(100% - 40px); background:#25D366; color:#0b2b18;">📲 Compartir catálogo por WhatsApp</button>
+    <button class="add-btn secondary" id="btn-catalog-export-feed" style="margin:0 20px 10px; width:calc(100% - 40px);">📦 Exportar para Facebook/TikTok</button>
+    <p class="scan-hint" id="catalog-feed-status" style="margin:0 20px 10px;"></p>
     <div class="catalog-grid" id="catalog-grid"></div>
   </div>
 
@@ -1114,6 +1128,35 @@
         <button class="add-btn" id="btn-save-settings" style="margin-top:14px;">Guardar</button>
         <p class="scan-hint" id="settings-status" style="margin-top:8px;"></p>
       </div>
+      <div class="cost-section">
+        <div class="cost-section-title">Ritmo de trabajo</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Para calcular fechas estimadas de entrega según tu cola de pedidos.</p>
+        <div class="cost-row">
+          <label>Horas disponibles al día para tejer</label>
+          <input type="number" inputmode="decimal" id="settings-hours-per-day" min="0.5" step="0.5" style="width:90px;">
+        </div>
+        <button class="add-btn" id="btn-save-work-settings" style="margin-top:14px;">Guardar</button>
+        <p class="scan-hint" id="work-settings-status" style="margin-top:8px;"></p>
+      </div>
+      <div class="cost-section">
+        <div class="cost-section-title">Respaldo automático por Telegram</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Manda tu respaldo solo, en silencio, cada vez que abras la app (si ya pasó el tiempo mínimo que definas abajo). Crea un bot gratis con @BotFather en Telegram para conseguir estos dos datos.</p>
+        <div class="cost-row">
+          <label>Token del bot</label>
+        </div>
+        <input type="text" id="settings-telegram-token" placeholder="123456:ABC-defGhIJklmNoP..." style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+        <div class="cost-row">
+          <label>Tu chat ID</label>
+          <input type="text" id="settings-telegram-chat-id" style="width:150px;">
+        </div>
+        <div class="cost-row">
+          <label>Cada cuántas horas (0 = cada vez que abras la app)</label>
+          <input type="number" inputmode="decimal" id="settings-telegram-interval" min="0" step="0.5" style="width:80px;">
+        </div>
+        <button class="add-btn" id="btn-save-telegram-settings" style="margin-top:10px;">Guardar</button>
+        <button class="add-btn secondary" id="btn-test-telegram" style="margin-top:10px;">Enviar respaldo de prueba ahora</button>
+        <p class="scan-hint" id="telegram-settings-status" style="margin-top:8px;"></p>
+      </div>
     </div>
   </div>
 
@@ -1133,6 +1176,40 @@
     </div>
     <div class="calendar-grid" id="calendar-grid"></div>
     <div class="calendar-day-list" id="calendar-day-list"></div>
+  </div>
+
+  <!-- COMPRESS PHOTO SCREEN -->
+  <div id="compress-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-compress-back">‹</button>
+      <div class="viewer-title">Comprimir foto</div>
+    </div>
+    <div class="cost-form">
+      <div class="cost-section">
+        <div class="cost-section-title">Foto a comprimir</div>
+        <button class="add-btn" id="btn-compress-pick"><span class="plus">🖼️</span> Elegir foto</button>
+        <input type="file" id="compress-photo-input" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="cost-section" id="compress-controls" style="display:none;">
+        <div class="cost-section-title">Ajustes</div>
+        <div class="cost-row">
+          <label>Tamaño máximo (lado más largo)</label>
+          <select id="compress-max-dim" style="width:110px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:9px 8px; font-size:14px;">
+            <option value="800">800 px</option>
+            <option value="1200" selected>1200 px</option>
+            <option value="1600">1600 px</option>
+            <option value="2000">2000 px</option>
+          </select>
+        </div>
+        <div class="cost-row"><label>Calidad</label><input type="range" id="compress-quality" min="50" max="95" value="80"></div>
+        <p class="scan-hint" id="compress-size-info" style="margin-top:8px;"></p>
+        <div class="wm-preview-wrap" style="margin-top:10px;">
+          <canvas id="compress-preview-canvas" style="max-width:100%; display:block;"></canvas>
+        </div>
+        <button class="add-btn" id="btn-compress-download" style="margin-top:14px;"><span class="plus">⬇️</span> Descargar foto comprimida</button>
+      </div>
+    </div>
   </div>
 
   <!-- ORDER DETAIL SCREEN -->
@@ -1188,19 +1265,31 @@
       </div>
 
       <div class="cost-section">
-        <div class="cost-section-title">Fecha de entrega</div>
-        <div class="cost-row">
-          <label>Fecha</label>
-          <input type="date" id="order-due-date">
-        </div>
-      </div>
-
-      <div class="cost-section">
         <div class="cost-section-title">Patrón de este pedido</div>
         <select id="order-pattern-select" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:11px 12px; font-size:14.5px;">
           <option value="">Ninguno</option>
         </select>
         <button class="add-counter-btn" id="btn-order-open-pattern" style="display:none; margin-top:8px;">📄 Abrir este patrón</button>
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Fecha estimada de entrega</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Calculada según tu cola de pedidos, el tiempo del patrón y tus horas disponibles al día.</p>
+        <button class="add-btn secondary" id="btn-calc-estimate">🔮 Calcular fecha estimada</button>
+        <div id="estimate-result" style="display:none; margin-top:12px;">
+          <div class="month-card">
+            <div><div class="month-name" id="estimate-date-label"></div><div class="month-sub" id="estimate-hours-label"></div></div>
+          </div>
+          <button class="add-counter-btn" id="btn-use-estimate">Usar esta fecha como entrega</button>
+        </div>
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Fecha de entrega</div>
+        <div class="cost-row">
+          <label>Fecha</label>
+          <input type="date" id="order-due-date">
+        </div>
       </div>
 
       <div class="cost-section">
@@ -2132,6 +2221,9 @@ function openCostDetail(id){
   document.getElementById('cost-margin').value = currentCost.margin || 0;
   document.getElementById('cost-sell-price').value = currentCost.sellPrice || '';
   document.getElementById('toggle-catalog').classList.toggle('active', !!currentCost.inCatalog);
+  document.getElementById('catalog-feed-fields').style.display = currentCost.inCatalog ? 'block' : 'none';
+  document.getElementById('cost-catalog-image-url').value = currentCost.catalogImageUrl || '';
+  document.getElementById('cost-catalog-description').value = currentCost.catalogDescription || '';
 
   renderMaterials();
   renderExtras();
@@ -2332,6 +2424,17 @@ document.getElementById('toggle-catalog').addEventListener('click', () => {
   if(!currentCost) return;
   currentCost.inCatalog = !currentCost.inCatalog;
   document.getElementById('toggle-catalog').classList.toggle('active', currentCost.inCatalog);
+  document.getElementById('catalog-feed-fields').style.display = currentCost.inCatalog ? 'block' : 'none';
+  persistCurrentCost();
+});
+document.getElementById('cost-catalog-image-url').addEventListener('input', (e) => {
+  if(!currentCost) return;
+  currentCost.catalogImageUrl = e.target.value.trim();
+  persistCurrentCost();
+});
+document.getElementById('cost-catalog-description').addEventListener('input', (e) => {
+  if(!currentCost) return;
+  currentCost.catalogDescription = e.target.value;
   persistCurrentCost();
 });
 
@@ -2573,6 +2676,8 @@ async function openOrderDetail(id){
   document.getElementById('order-deposit').value = currentOrder.deposit || '';
   document.getElementById('order-due-date').value = currentOrder.dueDate || '';
   document.getElementById('order-notes').value = currentOrder.notes || '';
+  document.getElementById('estimate-result').style.display = 'none';
+  lastEstimateDateStr = null;
 
   await populateOrderPatternSelect();
 
@@ -2781,6 +2886,72 @@ document.getElementById('btn-order-open-pattern').addEventListener('click', () =
   if(!currentOrder || !currentOrder.patternId) return;
   openPattern(currentOrder.patternId);
 });
+
+/* ---------------- Fecha estimada de entrega ---------------- */
+function getPatternEstimatedHours(patternId){
+  if(!patternId) return null;
+  try{
+    const raw = localStorage.getItem('progress_' + patternId);
+    if(!raw) return null;
+    const prog = JSON.parse(raw);
+    if(prog.estimatedHours && prog.estimatedHours > 0) return prog.estimatedHours;
+    if(prog.elapsedSeconds && prog.elapsedSeconds > 0) return prog.elapsedSeconds / 3600;
+  }catch(e){}
+  return null;
+}
+function getGlobalAverageHours(){
+  let total = 0, count = 0;
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if(!key || key.indexOf('progress_') !== 0) continue;
+    let prog;
+    try{ prog = JSON.parse(localStorage.getItem(key)); }catch(e){ continue; }
+    if(!prog) continue;
+    let h = null;
+    if(prog.estimatedHours && prog.estimatedHours > 0) h = prog.estimatedHours;
+    else if(prog.elapsedSeconds && prog.elapsedSeconds > 0) h = prog.elapsedSeconds / 3600;
+    if(h){ total += h; count++; }
+  }
+  return count > 0 ? (total / count) : 3; // 3 horas de respaldo si todavía no hay ningún dato tuyo
+}
+function getOrderEstimatedHours(order){
+  const h = getPatternEstimatedHours(order.patternId);
+  return (h != null) ? h : getGlobalAverageHours();
+}
+function computeEstimatedCompletionDate(targetOrderId){
+  const queue = getOrdersSorted().filter(o => o.status !== 'Entregado');
+  const idx = queue.findIndex(o => o.id === targetOrderId);
+  if(idx === -1) return null;
+  let totalHours = 0;
+  for(let i = 0; i <= idx; i++){
+    totalHours += getOrderEstimatedHours(queue[i]);
+  }
+  const hoursPerDay = getHoursPerDay();
+  const daysNeeded = Math.max(1, Math.ceil(totalHours / hoursPerDay));
+  const result = new Date();
+  result.setDate(result.getDate() + daysNeeded);
+  return { date: result, totalHours, daysNeeded };
+}
+
+let lastEstimateDateStr = null;
+document.getElementById('btn-calc-estimate').addEventListener('click', () => {
+  if(!currentOrder) return;
+  const est = computeEstimatedCompletionDate(currentOrder.id);
+  if(!est) return;
+  lastEstimateDateStr = formatDateLocal(est.date);
+  const label = est.date.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('estimate-date-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  document.getElementById('estimate-hours-label').textContent =
+    '≈ ' + est.totalHours.toFixed(1) + ' h acumuladas en tu cola · ' + getHoursPerDay() + ' h/día';
+  document.getElementById('estimate-result').style.display = 'block';
+});
+document.getElementById('btn-use-estimate').addEventListener('click', () => {
+  if(!currentOrder || !lastEstimateDateStr) return;
+  currentOrder.dueDate = lastEstimateDateStr;
+  document.getElementById('order-due-date').value = lastEstimateDateStr;
+  persistCurrentOrder();
+});
+
 ['order-price', 'order-deposit'].forEach(fieldId => {
   document.getElementById(fieldId).addEventListener('input', () => {
     if(!currentOrder) return;
@@ -3541,33 +3712,38 @@ function base64ToArrayBuffer(base64){
   return bytes.buffer;
 }
 
+async function buildBackupBlob(){
+  const patterns = await dbGetAll();
+  const patternsExport = patterns.map(p => ({
+    id: p.id, name: p.name, createdAt: p.createdAt,
+    pdfBase64: arrayBufferToBase64(p.pdfBuffer)
+  }));
+  const ls = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    ls[key] = localStorage.getItem(key);
+  }
+  const backup = {
+    version: 1,
+    app: 'Riyan Store - Patrones',
+    exportedAt: new Date().toISOString(),
+    localStorage: ls,
+    patterns: patternsExport
+  };
+  const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+  const dateStr = new Date().toISOString().slice(0, 10);
+  return { blob, filename: 'respaldo-riyanstore-' + dateStr + '.json' };
+}
+
 document.getElementById('btn-export-backup').addEventListener('click', async () => {
   const statusEl = document.getElementById('backup-status');
   statusEl.textContent = 'Preparando respaldo...';
   try{
-    const patterns = await dbGetAll();
-    const patternsExport = patterns.map(p => ({
-      id: p.id, name: p.name, createdAt: p.createdAt,
-      pdfBase64: arrayBufferToBase64(p.pdfBuffer)
-    }));
-    const ls = {};
-    for(let i = 0; i < localStorage.length; i++){
-      const key = localStorage.key(i);
-      ls[key] = localStorage.getItem(key);
-    }
-    const backup = {
-      version: 1,
-      app: 'Riyan Store - Patrones',
-      exportedAt: new Date().toISOString(),
-      localStorage: ls,
-      patterns: patternsExport
-    };
-    const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+    const { blob, filename } = await buildBackupBlob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const dateStr = new Date().toISOString().slice(0, 10);
-    a.download = 'respaldo-riyanstore-' + dateStr + '.json';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3728,6 +3904,66 @@ document.getElementById('btn-catalog-share').addEventListener('click', () => {
   msg += '\nEscríbeme para hacer tu pedido 💕';
   const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
+});
+
+function csvEscape(value){
+  const str = String(value == null ? '' : value);
+  if(/[",\n]/.test(str)){
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+document.getElementById('btn-catalog-export-feed').addEventListener('click', () => {
+  const statusEl = document.getElementById('catalog-feed-status');
+  const items = loadCosts().filter(c => c.inCatalog).sort((a, b) => b.createdAt - a.createdAt);
+  if(items.length === 0){
+    statusEl.textContent = 'Aún no tienes productos marcados para catálogo.';
+    return;
+  }
+  const withImage = items.filter(c => c.catalogImageUrl && c.catalogImageUrl.trim());
+  const withoutImage = items.length - withImage.length;
+  if(withImage.length === 0){
+    statusEl.textContent = '⚠️ Ninguno de tus productos tiene la "URL de la foto (pública)" puesta. Ábrelos, sube su foto a Supabase y pega el link ahí primero.';
+    return;
+  }
+
+  const header = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand'];
+  const rows = [header.map(csvEscape).join(',')];
+  const brand = getStoreName();
+  const waDigits = getStorePhoneDigits();
+
+  withImage.forEach(c => {
+    const price = getCostFinalPrice(c);
+    const desc = (c.catalogDescription && c.catalogDescription.trim()) || c.name || 'Amigurumi tejido a mano';
+    const link = 'https://wa.me/' + waDigits + '?text=' + encodeURIComponent('Me interesa: ' + (c.name || 'este producto'));
+    const row = [
+      c.id,
+      c.name || 'Producto',
+      desc,
+      'in stock',
+      'new',
+      price.toFixed(2) + ' MXN',
+      link,
+      c.catalogImageUrl.trim(),
+      brand
+    ];
+    rows.push(row.map(csvEscape).join(','));
+  });
+
+  const csvContent = rows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'catalogo-facebook-tiktok.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+  statusEl.textContent = '✅ CSV descargado con ' + withImage.length + ' producto' + (withImage.length === 1 ? '' : 's') + '.' +
+    (withoutImage > 0 ? ' ⚠️ ' + withoutImage + ' producto' + (withoutImage === 1 ? '' : 's') + ' se quedó fuera por no tener URL de foto.' : '');
 });
 
 /* ---------------- Clientes ---------------- */
@@ -3930,6 +4166,7 @@ async function renderStats(){
 /* ---------------- Configuración de la tienda ---------------- */
 const STORE_NAME_KEY = 'amigurumi_store_name';
 const STORE_PHONE_KEY = 'amigurumi_store_phone';
+const HOURS_PER_DAY_KEY = 'amigurumi_hours_per_day';
 
 function getStoreName(){
   return localStorage.getItem(STORE_NAME_KEY) || 'Riyan Store';
@@ -3943,6 +4180,10 @@ function getStorePhoneDisplay(){
   const raw = localStorage.getItem(STORE_PHONE_KEY);
   return raw || '566 452 7042';
 }
+function getHoursPerDay(){
+  const v = parseFloat(localStorage.getItem(HOURS_PER_DAY_KEY));
+  return (v && v > 0) ? v : 6;
+}
 function applyStoreBranding(){
   document.getElementById('brand-name-el').textContent = getStoreName();
   document.getElementById('brand-contact-el').textContent = 'WhatsApp ' + getStorePhoneDisplay();
@@ -3953,7 +4194,16 @@ function applyStoreBranding(){
 document.getElementById('btn-open-settings').addEventListener('click', () => {
   document.getElementById('settings-store-name').value = getStoreName();
   document.getElementById('settings-store-phone').value = localStorage.getItem(STORE_PHONE_KEY) || '5664527042';
+  document.getElementById('settings-hours-per-day').value = getHoursPerDay();
+  document.getElementById('settings-telegram-token').value = localStorage.getItem(TELEGRAM_TOKEN_KEY) || '';
+  document.getElementById('settings-telegram-chat-id').value = localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '';
+  document.getElementById('settings-telegram-interval').value = getTelegramIntervalHours();
   document.getElementById('settings-status').textContent = '';
+  document.getElementById('work-settings-status').textContent = '';
+  const lastSent = localStorage.getItem(LAST_AUTO_BACKUP_KEY);
+  document.getElementById('telegram-settings-status').textContent = lastSent
+    ? 'Último respaldo automático enviado: ' + new Date(parseInt(lastSent, 10)).toLocaleString('es-MX')
+    : '';
   showScreen('settings-home');
 });
 document.getElementById('btn-settings-back').addEventListener('click', () => {
@@ -3966,6 +4216,89 @@ document.getElementById('btn-save-settings').addEventListener('click', () => {
   if(phone) localStorage.setItem(STORE_PHONE_KEY, phone);
   applyStoreBranding();
   document.getElementById('settings-status').textContent = '✅ Guardado.';
+});
+document.getElementById('btn-save-work-settings').addEventListener('click', () => {
+  const hours = parseFloat(document.getElementById('settings-hours-per-day').value);
+  if(hours && hours > 0) localStorage.setItem(HOURS_PER_DAY_KEY, hours);
+  document.getElementById('work-settings-status').textContent = '✅ Guardado.';
+});
+
+/* ---------------- Respaldo automático por Telegram ---------------- */
+const TELEGRAM_TOKEN_KEY = 'amigurumi_telegram_token';
+const TELEGRAM_CHAT_ID_KEY = 'amigurumi_telegram_chat_id';
+const TELEGRAM_INTERVAL_KEY = 'amigurumi_telegram_interval_hours';
+const LAST_AUTO_BACKUP_KEY = 'amigurumi_last_auto_backup';
+
+function getTelegramIntervalHours(){
+  const v = parseFloat(localStorage.getItem(TELEGRAM_INTERVAL_KEY));
+  return (v != null && !isNaN(v) && v >= 0) ? v : 12; // 12 horas por defecto
+}
+
+document.getElementById('btn-save-telegram-settings').addEventListener('click', () => {
+  const token = document.getElementById('settings-telegram-token').value.trim();
+  const chatId = document.getElementById('settings-telegram-chat-id').value.trim();
+  const interval = parseFloat(document.getElementById('settings-telegram-interval').value);
+  if(token) localStorage.setItem(TELEGRAM_TOKEN_KEY, token); else localStorage.removeItem(TELEGRAM_TOKEN_KEY);
+  if(chatId) localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId); else localStorage.removeItem(TELEGRAM_CHAT_ID_KEY);
+  if(!isNaN(interval) && interval >= 0) localStorage.setItem(TELEGRAM_INTERVAL_KEY, interval);
+  document.getElementById('telegram-settings-status').textContent = '✅ Guardado.';
+});
+
+async function sendBackupToTelegram(){
+  const token = localStorage.getItem(TELEGRAM_TOKEN_KEY);
+  const chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
+  if(!token || !chatId) return { ok: false, reason: 'sin-configurar' };
+  const { blob, filename } = await buildBackupBlob();
+  if(blob.size > 45 * 1024 * 1024){
+    return { ok: false, reason: 'muy-pesado' };
+  }
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  form.append('caption', '🧶 Respaldo automático — ' + new Date().toLocaleString('es-MX'));
+  form.append('document', blob, filename);
+  const res = await fetch('https://api.telegram.org/bot' + token + '/sendDocument', {
+    method: 'POST',
+    body: form
+  });
+  const data = await res.json().catch(() => null);
+  if(!res.ok || !data || !data.ok){
+    return { ok: false, reason: 'error-telegram' };
+  }
+  localStorage.setItem(LAST_AUTO_BACKUP_KEY, String(Date.now()));
+  return { ok: true };
+}
+
+async function checkAutoTelegramBackup(){
+  const token = localStorage.getItem(TELEGRAM_TOKEN_KEY);
+  const chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
+  if(!token || !chatId) return;
+  const last = parseInt(localStorage.getItem(LAST_AUTO_BACKUP_KEY) || '0', 10);
+  const intervalMs = getTelegramIntervalHours() * 60 * 60 * 1000;
+  if(Date.now() - last < intervalMs) return;
+  try{ await sendBackupToTelegram(); }catch(e){ /* silencioso: se reintenta la próxima vez que abra la app */ }
+}
+
+document.getElementById('btn-test-telegram').addEventListener('click', async () => {
+  const statusEl = document.getElementById('telegram-settings-status');
+  statusEl.textContent = 'Enviando...';
+  const token = document.getElementById('settings-telegram-token').value.trim();
+  const chatId = document.getElementById('settings-telegram-chat-id').value.trim();
+  if(token) localStorage.setItem(TELEGRAM_TOKEN_KEY, token);
+  if(chatId) localStorage.setItem(TELEGRAM_CHAT_ID_KEY, chatId);
+  try{
+    const result = await sendBackupToTelegram();
+    if(result.ok){
+      statusEl.textContent = '✅ Enviado a Telegram correctamente.';
+    } else if(result.reason === 'sin-configurar'){
+      statusEl.textContent = '⚠️ Falta el token o el chat ID.';
+    } else if(result.reason === 'muy-pesado'){
+      statusEl.textContent = '⚠️ El respaldo pesa más de lo que Telegram permite recibir de un bot.';
+    } else {
+      statusEl.textContent = '⚠️ Telegram rechazó el envío. Revisa el token y el chat ID.';
+    }
+  }catch(e){
+    statusEl.textContent = '⚠️ No se pudo conectar con Telegram. Revisa tu internet.';
+  }
 });
 
 /* ---------------- Calendario de entregas ---------------- */
@@ -4069,9 +4402,83 @@ function renderCalendarDayList(ordersByDate){
   });
 }
 
+/* ---------------- Comprimir foto ---------------- */
+let compressState = { img: null, originalSize: 0, fileName: 'foto' };
+
+document.getElementById('btn-open-compress').addEventListener('click', () => {
+  document.getElementById('compress-controls').style.display = 'none';
+  compressState = { img: null, originalSize: 0, fileName: 'foto' };
+  showScreen('compress-home');
+});
+document.getElementById('btn-compress-back').addEventListener('click', () => {
+  showScreen('home');
+});
+document.getElementById('btn-compress-pick').addEventListener('click', () => {
+  document.getElementById('compress-photo-input').click();
+});
+document.getElementById('compress-photo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  compressState.originalSize = file.size;
+  compressState.fileName = (file.name || 'foto').replace(/\.[^.]+$/, '') || 'foto';
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      compressState.img = img;
+      document.getElementById('compress-controls').style.display = 'block';
+      renderCompressPreview();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+function renderCompressPreview(){
+  if(!compressState.img) return;
+  const maxDim = parseInt(document.getElementById('compress-max-dim').value, 10);
+  const quality = parseInt(document.getElementById('compress-quality').value, 10) / 100;
+  let w = compressState.img.naturalWidth, h = compressState.img.naturalHeight;
+  if(Math.max(w, h) > maxDim){
+    const scale = maxDim / Math.max(w, h);
+    w = Math.round(w * scale); h = Math.round(h * scale);
+  }
+  const canvas = document.getElementById('compress-preview-canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(compressState.img, 0, 0, w, h);
+  canvas.toBlob((blob) => {
+    if(!blob) return;
+    const kb = (blob.size / 1024).toFixed(0);
+    const originalKb = (compressState.originalSize / 1024).toFixed(0);
+    document.getElementById('compress-size-info').textContent =
+      'Original: ' + originalKb + ' KB → Comprimida: ' + kb + ' KB (' + w + '×' + h + ' px)';
+  }, 'image/jpeg', quality);
+}
+document.getElementById('compress-max-dim').addEventListener('change', renderCompressPreview);
+document.getElementById('compress-quality').addEventListener('input', renderCompressPreview);
+
+document.getElementById('btn-compress-download').addEventListener('click', () => {
+  if(!compressState.img) return;
+  const canvas = document.getElementById('compress-preview-canvas');
+  const quality = parseInt(document.getElementById('compress-quality').value, 10) / 100;
+  canvas.toBlob((blob) => {
+    if(!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = compressState.fileName + '-comprimida.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }, 'image/jpeg', quality);
+});
+
 /* ---------------- Init ---------------- */
 applyStoreBranding();
 renderHome();
+checkAutoTelegramBackup();
 </script>
 </body>
 </html>
