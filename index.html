@@ -1146,9 +1146,9 @@
         </div>
         <input type="text" id="settings-telegram-token" placeholder="123456:ABC-defGhIJklmNoP..." style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
         <div class="cost-row">
-          <label>Tu chat ID</label>
-          <input type="text" id="settings-telegram-chat-id" style="width:150px;">
+          <label>Chat ID(s) — separados por coma si son varios</label>
         </div>
+        <input type="text" id="settings-telegram-chat-id" placeholder="123456789, 987654321" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
         <div class="cost-row">
           <label>Cada cuántas horas (0 = cada vez que abras la app)</label>
           <input type="number" inputmode="decimal" id="settings-telegram-interval" min="0" step="0.5" style="width:80px;">
@@ -4246,26 +4246,38 @@ document.getElementById('btn-save-telegram-settings').addEventListener('click', 
 
 async function sendBackupToTelegram(){
   const token = localStorage.getItem(TELEGRAM_TOKEN_KEY);
-  const chatId = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
-  if(!token || !chatId) return { ok: false, reason: 'sin-configurar' };
+  const chatIdRaw = localStorage.getItem(TELEGRAM_CHAT_ID_KEY);
+  if(!token || !chatIdRaw) return { ok: false, reason: 'sin-configurar' };
+  const chatIds = chatIdRaw.split(',').map(s => s.trim()).filter(Boolean);
+  if(chatIds.length === 0) return { ok: false, reason: 'sin-configurar' };
+
   const { blob, filename } = await buildBackupBlob();
   if(blob.size > 45 * 1024 * 1024){
     return { ok: false, reason: 'muy-pesado' };
   }
-  const form = new FormData();
-  form.append('chat_id', chatId);
-  form.append('caption', '🧶 Respaldo automático — ' + new Date().toLocaleString('es-MX'));
-  form.append('document', blob, filename);
-  const res = await fetch('https://api.telegram.org/bot' + token + '/sendDocument', {
-    method: 'POST',
-    body: form
-  });
-  const data = await res.json().catch(() => null);
-  if(!res.ok || !data || !data.ok){
-    return { ok: false, reason: 'error-telegram' };
+
+  let successCount = 0;
+  const failed = [];
+  for(const chatId of chatIds){
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append('caption', '🧶 Respaldo automático — ' + new Date().toLocaleString('es-MX'));
+    form.append('document', blob, filename);
+    try{
+      const res = await fetch('https://api.telegram.org/bot' + token + '/sendDocument', {
+        method: 'POST',
+        body: form
+      });
+      const data = await res.json().catch(() => null);
+      if(res.ok && data && data.ok){ successCount++; } else { failed.push(chatId); }
+    }catch(e){
+      failed.push(chatId);
+    }
   }
+
+  if(successCount === 0) return { ok: false, reason: 'error-telegram' };
   localStorage.setItem(LAST_AUTO_BACKUP_KEY, String(Date.now()));
-  return { ok: true };
+  return { ok: true, successCount, total: chatIds.length, failed };
 }
 
 async function checkAutoTelegramBackup(){
@@ -4288,13 +4300,15 @@ document.getElementById('btn-test-telegram').addEventListener('click', async () 
   try{
     const result = await sendBackupToTelegram();
     if(result.ok){
-      statusEl.textContent = '✅ Enviado a Telegram correctamente.';
+      statusEl.textContent = (result.total > 1)
+        ? '✅ Enviado a ' + result.successCount + ' de ' + result.total + ' chats.' + (result.failed.length > 0 ? ' Revisa que estos ya le dieron Start al bot: ' + result.failed.join(', ') : '')
+        : '✅ Enviado a Telegram correctamente.';
     } else if(result.reason === 'sin-configurar'){
       statusEl.textContent = '⚠️ Falta el token o el chat ID.';
     } else if(result.reason === 'muy-pesado'){
       statusEl.textContent = '⚠️ El respaldo pesa más de lo que Telegram permite recibir de un bot.';
     } else {
-      statusEl.textContent = '⚠️ Telegram rechazó el envío. Revisa el token y el chat ID.';
+      statusEl.textContent = '⚠️ Telegram rechazó el envío. Revisa el token y el/los chat ID (recuerda: cada persona debe haberle dado Start al bot antes).';
     }
   }catch(e){
     statusEl.textContent = '⚠️ No se pudo conectar con Telegram. Revisa tu internet.';
