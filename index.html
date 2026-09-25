@@ -4560,7 +4560,9 @@ function getGDriveIntervalHours(){
   return (v != null && !isNaN(v) && v >= 0) ? v : 12;
 }
 function getGDriveRedirectUri(){
-  return location.origin + location.pathname;
+  // Siempre la raíz del sitio con diagonal al final, para que coincida exacto
+  // sin importar cómo se haya abierto la app (con o sin /index.html, con o sin diagonal).
+  return location.origin + '/';
 }
 function isGDriveConnected(){
   return !!localStorage.getItem(GDRIVE_REFRESH_TOKEN_KEY);
