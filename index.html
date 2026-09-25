@@ -1140,7 +1140,7 @@
       </div>
       <div class="cost-section">
         <div class="cost-section-title">Respaldo automático por Telegram</div>
-        <p class="scan-hint" style="margin:-4px 0 10px;">Manda tu respaldo solo, en silencio, cada vez que abras la app (si ya pasó el tiempo mínimo que definas abajo). Crea un bot gratis con @BotFather en Telegram para conseguir estos dos datos.</p>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Manda tu respaldo solo, en silencio, cada vez que abras la app (si ya pasó el tiempo mínimo que definas abajo). Incluye pedidos, clientes, costeos, progreso, notas y configuración — no incluye los PDF de tus patrones (pesan mucho y Telegram no los recibe de un bot); esos guárdalos con el botón "Exportar respaldo" de arriba. Crea un bot gratis con @BotFather en Telegram para conseguir estos dos datos.</p>
         <div class="cost-row">
           <label>Token del bot</label>
         </div>
@@ -1156,6 +1156,26 @@
         <button class="add-btn" id="btn-save-telegram-settings" style="margin-top:10px;">Guardar</button>
         <button class="add-btn secondary" id="btn-test-telegram" style="margin-top:10px;">Enviar respaldo de prueba ahora</button>
         <p class="scan-hint" id="telegram-settings-status" style="margin-top:8px;"></p>
+      </div>
+      <div class="cost-section">
+        <div class="cost-section-title">Respaldo automático a Google Drive</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Sube tu respaldo COMPLETO (con tus patrones incluidos) solo, en silencio, cada vez que abras la app. No tiene el límite de peso de Telegram. Pega aquí el Client ID y Client Secret que te dé Google al crear tu proyecto gratis (te guío en la conversación), y dale "Conectar con Google". Cada semana aprox. Google va a pedirte reconectar (un clic nada más).</p>
+        <div class="cost-row">
+          <label>Client ID</label>
+        </div>
+        <input type="text" id="settings-gdrive-client-id" placeholder="123456789-abc...apps.googleusercontent.com" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+        <div class="cost-row">
+          <label>Client Secret</label>
+        </div>
+        <input type="text" id="settings-gdrive-client-secret" placeholder="GOCSPX-..." style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+        <div class="cost-row">
+          <label>Cada cuántas horas (0 = cada vez que abras la app)</label>
+          <input type="number" inputmode="decimal" id="settings-gdrive-interval" min="0" step="0.5" style="width:80px;">
+        </div>
+        <button class="add-btn" id="btn-gdrive-connect" style="margin-top:10px;">Conectar con Google</button>
+        <button class="add-btn secondary" id="btn-gdrive-test" style="margin-top:10px;">Subir respaldo de prueba ahora</button>
+        <button class="add-btn secondary" id="btn-gdrive-disconnect" style="margin-top:10px; display:none;">Desconectar cuenta de Google</button>
+        <p class="scan-hint" id="gdrive-settings-status" style="margin-top:8px;"></p>
       </div>
     </div>
   </div>
@@ -3735,6 +3755,27 @@ async function buildBackupBlob(){
   return { blob, filename: 'respaldo-riyanstore-' + dateStr + '.json' };
 }
 
+// Respaldo liviano: solo los datos del negocio (pedidos, clientes, costeos, progreso, notas, configuración),
+// SIN los PDF de los patrones (esos pesan mucho y ya los tienes guardados aparte). Pensado para Telegram,
+// que solo acepta hasta 50MB por documento enviado desde un bot.
+async function buildDataBackupBlob(){
+  const ls = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    ls[key] = localStorage.getItem(key);
+  }
+  const backup = {
+    version: 1,
+    app: 'Riyan Store - Patrones',
+    tipo: 'datos-sin-pdfs',
+    exportedAt: new Date().toISOString(),
+    localStorage: ls
+  };
+  const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+  const dateStr = new Date().toISOString().slice(0, 10);
+  return { blob, filename: 'respaldo-datos-riyanstore-' + dateStr + '.json' };
+}
+
 document.getElementById('btn-export-backup').addEventListener('click', async () => {
   const statusEl = document.getElementById('backup-status');
   statusEl.textContent = 'Preparando respaldo...';
@@ -4204,6 +4245,20 @@ document.getElementById('btn-open-settings').addEventListener('click', () => {
   document.getElementById('telegram-settings-status').textContent = lastSent
     ? 'Último respaldo automático enviado: ' + new Date(parseInt(lastSent, 10)).toLocaleString('es-MX')
     : '';
+  document.getElementById('settings-gdrive-client-id').value = localStorage.getItem(GDRIVE_CLIENT_ID_KEY) || '';
+  document.getElementById('settings-gdrive-client-secret').value = localStorage.getItem(GDRIVE_CLIENT_SECRET_KEY) || '';
+  document.getElementById('settings-gdrive-interval').value = getGDriveIntervalHours();
+  updateGDriveConnectionUI();
+  const pendingMsg = sessionStorage.getItem(GDRIVE_PENDING_MSG_KEY);
+  if(pendingMsg){
+    document.getElementById('gdrive-settings-status').textContent = pendingMsg;
+    sessionStorage.removeItem(GDRIVE_PENDING_MSG_KEY);
+  } else {
+    const lastGDrive = localStorage.getItem(LAST_GDRIVE_BACKUP_KEY);
+    document.getElementById('gdrive-settings-status').textContent = lastGDrive
+      ? (isGDriveConnected() ? 'Conectado ✅. Último respaldo subido: ' + new Date(parseInt(lastGDrive, 10)).toLocaleString('es-MX') : 'Última subida: ' + new Date(parseInt(lastGDrive, 10)).toLocaleString('es-MX') + ' — reconecta tu cuenta.')
+      : (isGDriveConnected() ? 'Conectado ✅. Aún no se ha subido ningún respaldo.' : '');
+  }
   showScreen('settings-home');
 });
 document.getElementById('btn-settings-back').addEventListener('click', () => {
@@ -4251,7 +4306,7 @@ async function sendBackupToTelegram(){
   const chatIds = chatIdRaw.split(',').map(s => s.trim()).filter(Boolean);
   if(chatIds.length === 0) return { ok: false, reason: 'sin-configurar' };
 
-  const { blob, filename } = await buildBackupBlob();
+  const { blob, filename } = await buildDataBackupBlob();
   if(blob.size > 45 * 1024 * 1024){
     return { ok: false, reason: 'muy-pesado' };
   }
@@ -4261,7 +4316,7 @@ async function sendBackupToTelegram(){
   for(const chatId of chatIds){
     const form = new FormData();
     form.append('chat_id', chatId);
-    form.append('caption', '🧶 Respaldo automático — ' + new Date().toLocaleString('es-MX'));
+    form.append('caption', '🧶 Respaldo automático (pedidos, clientes, costeos y config — sin PDFs de patrones) — ' + new Date().toLocaleString('es-MX'));
     form.append('document', blob, filename);
     try{
       const res = await fetch('https://api.telegram.org/bot' + token + '/sendDocument', {
@@ -4489,10 +4544,223 @@ document.getElementById('btn-compress-download').addEventListener('click', () =>
   }, 'image/jpeg', quality);
 });
 
+/* ---------------- Respaldo automático a Google Drive ---------------- */
+const GDRIVE_CLIENT_ID_KEY = 'amigurumi_gdrive_client_id';
+const GDRIVE_CLIENT_SECRET_KEY = 'amigurumi_gdrive_client_secret';
+const GDRIVE_REFRESH_TOKEN_KEY = 'amigurumi_gdrive_refresh_token';
+const GDRIVE_ACCESS_TOKEN_KEY = 'amigurumi_gdrive_access_token';
+const GDRIVE_ACCESS_TOKEN_EXP_KEY = 'amigurumi_gdrive_access_token_exp';
+const GDRIVE_FILE_ID_KEY = 'amigurumi_gdrive_file_id';
+const GDRIVE_INTERVAL_KEY = 'amigurumi_gdrive_interval_hours';
+const LAST_GDRIVE_BACKUP_KEY = 'amigurumi_last_gdrive_backup';
+const GDRIVE_PENDING_MSG_KEY = 'amigurumi_gdrive_pending_msg';
+
+function getGDriveIntervalHours(){
+  const v = parseFloat(localStorage.getItem(GDRIVE_INTERVAL_KEY));
+  return (v != null && !isNaN(v) && v >= 0) ? v : 12;
+}
+function getGDriveRedirectUri(){
+  return location.origin + location.pathname;
+}
+function isGDriveConnected(){
+  return !!localStorage.getItem(GDRIVE_REFRESH_TOKEN_KEY);
+}
+function updateGDriveConnectionUI(){
+  const connected = isGDriveConnected();
+  document.getElementById('btn-gdrive-connect').textContent = connected ? 'Reconectar con Google' : 'Conectar con Google';
+  document.getElementById('btn-gdrive-disconnect').style.display = connected ? '' : 'none';
+}
+
+document.getElementById('btn-gdrive-connect').addEventListener('click', () => {
+  const clientId = document.getElementById('settings-gdrive-client-id').value.trim();
+  const clientSecret = document.getElementById('settings-gdrive-client-secret').value.trim();
+  const interval = parseFloat(document.getElementById('settings-gdrive-interval').value);
+  const statusEl = document.getElementById('gdrive-settings-status');
+  if(!clientId || !clientSecret){
+    statusEl.textContent = '⚠️ Pon el Client ID y el Client Secret primero.';
+    return;
+  }
+  localStorage.setItem(GDRIVE_CLIENT_ID_KEY, clientId);
+  localStorage.setItem(GDRIVE_CLIENT_SECRET_KEY, clientSecret);
+  if(!isNaN(interval) && interval >= 0) localStorage.setItem(GDRIVE_INTERVAL_KEY, interval);
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: getGDriveRedirectUri(),
+    response_type: 'code',
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    access_type: 'offline',
+    prompt: 'consent'
+  });
+  location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
+});
+
+document.getElementById('btn-gdrive-disconnect').addEventListener('click', () => {
+  if(!confirm('¿Desconectar tu cuenta de Google? Ya no se subirán respaldos automáticos hasta que vuelvas a conectarla.')) return;
+  localStorage.removeItem(GDRIVE_REFRESH_TOKEN_KEY);
+  localStorage.removeItem(GDRIVE_ACCESS_TOKEN_KEY);
+  localStorage.removeItem(GDRIVE_ACCESS_TOKEN_EXP_KEY);
+  localStorage.removeItem(GDRIVE_FILE_ID_KEY);
+  document.getElementById('gdrive-settings-status').textContent = 'Cuenta desconectada.';
+  updateGDriveConnectionUI();
+});
+
+async function handleGoogleAuthRedirect(){
+  const url = new URL(location.href);
+  const code = url.searchParams.get('code');
+  const errorParam = url.searchParams.get('error');
+  if(!code && !errorParam) return;
+  url.searchParams.delete('code');
+  url.searchParams.delete('scope');
+  url.searchParams.delete('error');
+  history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+  if(errorParam){
+    sessionStorage.setItem(GDRIVE_PENDING_MSG_KEY, '⚠️ No se completó la conexión con Google.');
+    return;
+  }
+  const clientId = localStorage.getItem(GDRIVE_CLIENT_ID_KEY);
+  const clientSecret = localStorage.getItem(GDRIVE_CLIENT_SECRET_KEY);
+  if(!clientId || !clientSecret) return;
+  try{
+    const res = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code: code,
+        grant_type: 'authorization_code',
+        redirect_uri: getGDriveRedirectUri()
+      })
+    });
+    const data = await res.json();
+    if(data.access_token){
+      localStorage.setItem(GDRIVE_ACCESS_TOKEN_KEY, data.access_token);
+      localStorage.setItem(GDRIVE_ACCESS_TOKEN_EXP_KEY, String(Date.now() + ((data.expires_in || 3600) * 1000) - 30000));
+    }
+    if(data.refresh_token){
+      localStorage.setItem(GDRIVE_REFRESH_TOKEN_KEY, data.refresh_token);
+      sessionStorage.setItem(GDRIVE_PENDING_MSG_KEY, '✅ Cuenta de Google conectada.');
+    } else if(data.access_token){
+      sessionStorage.setItem(GDRIVE_PENDING_MSG_KEY, '⚠️ Google no mandó el permiso permanente. Dale "Desconectar" y conecta de nuevo.');
+    } else {
+      sessionStorage.setItem(GDRIVE_PENDING_MSG_KEY, '⚠️ Google rechazó la conexión. Revisa el Client ID y Client Secret.');
+    }
+  }catch(e){
+    sessionStorage.setItem(GDRIVE_PENDING_MSG_KEY, '⚠️ No se pudo conectar con Google. Revisa tu internet.');
+  }
+}
+
+async function getValidGDriveAccessToken(){
+  const refreshToken = localStorage.getItem(GDRIVE_REFRESH_TOKEN_KEY);
+  if(!refreshToken) return null;
+  const exp = parseInt(localStorage.getItem(GDRIVE_ACCESS_TOKEN_EXP_KEY) || '0', 10);
+  const cached = localStorage.getItem(GDRIVE_ACCESS_TOKEN_KEY);
+  if(cached && Date.now() < exp) return cached;
+  const clientId = localStorage.getItem(GDRIVE_CLIENT_ID_KEY);
+  const clientSecret = localStorage.getItem(GDRIVE_CLIENT_SECRET_KEY);
+  if(!clientId || !clientSecret) return null;
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token'
+    })
+  });
+  const data = await res.json().catch(() => null);
+  if(!data || data.error){
+    if(data && data.error === 'invalid_grant'){
+      // la conexión venció (normal cada ~7 días en modo prueba de Google): hay que reconectar
+      localStorage.removeItem(GDRIVE_REFRESH_TOKEN_KEY);
+      localStorage.removeItem(GDRIVE_ACCESS_TOKEN_KEY);
+    }
+    return null;
+  }
+  localStorage.setItem(GDRIVE_ACCESS_TOKEN_KEY, data.access_token);
+  localStorage.setItem(GDRIVE_ACCESS_TOKEN_EXP_KEY, String(Date.now() + ((data.expires_in || 3600) * 1000) - 30000));
+  return data.access_token;
+}
+
+async function uploadBackupToDrive(){
+  const accessToken = await getValidGDriveAccessToken();
+  if(!accessToken) return { ok: false, reason: 'sin-conectar' };
+  const { blob, filename } = await buildBackupBlob();
+  const existingFileId = localStorage.getItem(GDRIVE_FILE_ID_KEY);
+  const metadata = existingFileId ? { name: filename } : { name: filename, mimeType: 'application/json' };
+
+  try{
+    const initRes = await fetch(
+      existingFileId
+        ? 'https://www.googleapis.com/upload/drive/v3/files/' + existingFileId + '?uploadType=resumable'
+        : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
+      {
+        method: existingFileId ? 'PATCH' : 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Upload-Content-Type': 'application/json'
+        },
+        body: JSON.stringify(metadata)
+      }
+    );
+    if(!initRes.ok){
+      if(initRes.status === 404 && existingFileId){
+        // el archivo ya no existe (se borró a mano en Drive): olvidamos el id y lo creamos de nuevo
+        localStorage.removeItem(GDRIVE_FILE_ID_KEY);
+        return uploadBackupToDrive();
+      }
+      return { ok: false, reason: 'error-drive' };
+    }
+    const uploadUrl = initRes.headers.get('Location');
+    if(!uploadUrl) return { ok: false, reason: 'error-drive' };
+    const putRes = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: blob
+    });
+    if(!putRes.ok) return { ok: false, reason: 'error-drive' };
+    const fileData = await putRes.json().catch(() => null);
+    if(fileData && fileData.id) localStorage.setItem(GDRIVE_FILE_ID_KEY, fileData.id);
+    localStorage.setItem(LAST_GDRIVE_BACKUP_KEY, String(Date.now()));
+    return { ok: true };
+  }catch(e){
+    return { ok: false, reason: 'error-drive' };
+  }
+}
+
+async function checkAutoGDriveBackup(){
+  if(!isGDriveConnected()) return;
+  const last = parseInt(localStorage.getItem(LAST_GDRIVE_BACKUP_KEY) || '0', 10);
+  const intervalMs = getGDriveIntervalHours() * 60 * 60 * 1000;
+  if(Date.now() - last < intervalMs) return;
+  try{ await uploadBackupToDrive(); }catch(e){ /* silencioso: se reintenta la próxima vez que abra la app */ }
+}
+
+document.getElementById('btn-gdrive-test').addEventListener('click', async () => {
+  const statusEl = document.getElementById('gdrive-settings-status');
+  statusEl.textContent = 'Subiendo...';
+  try{
+    const result = await uploadBackupToDrive();
+    if(result.ok){
+      statusEl.textContent = '✅ Respaldo completo subido a Google Drive.';
+    } else if(result.reason === 'sin-conectar'){
+      statusEl.textContent = '⚠️ Conecta (o reconecta) tu cuenta de Google primero.';
+    } else {
+      statusEl.textContent = '⚠️ Google rechazó la subida. Intenta reconectar tu cuenta.';
+    }
+  }catch(e){
+    statusEl.textContent = '⚠️ No se pudo conectar con Google Drive. Revisa tu internet.';
+  }
+  updateGDriveConnectionUI();
+});
+
 /* ---------------- Init ---------------- */
 applyStoreBranding();
 renderHome();
 checkAutoTelegramBackup();
+handleGoogleAuthRedirect().then(() => { checkAutoGDriveBackup(); });
 </script>
 </body>
 </html>
