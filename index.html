@@ -4709,7 +4709,10 @@ function renderCompressPreview(){
   }
   const canvas = document.getElementById('compress-preview-canvas');
   canvas.width = w; canvas.height = h;
-  canvas.getContext('2d').drawImage(compressState.img, 0, 0, w, h);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+  ctx.drawImage(compressState.img, 0, 0, w, h);
   canvas.toBlob((blob) => {
     if(!blob) return;
     const kb = (blob.size / 1024).toFixed(0);
