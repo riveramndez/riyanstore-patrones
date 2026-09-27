@@ -715,6 +715,10 @@
       <button class="add-counter-btn" id="btn-add-counter2">+ Agregar otro contador (ej. puntadas)</button>
       <button class="add-counter-btn" id="btn-open-notes">📝 Notas del trabajo (aguja, hilo, etc.)</button>
       <button class="add-counter-btn" id="btn-open-estimate">⏱️ Tiempo estimado (opcional)</button>
+      <button class="add-counter-btn" id="btn-add-pages">➕ Agregar páginas a este patrón</button>
+      <p class="scan-hint" id="add-pages-status" style="margin-top:4px;"></p>
+      <input type="file" id="add-pages-images-input" accept="image/*" multiple style="display:none;">
+      <input type="file" id="add-pages-pdf-input" accept="application/pdf" style="display:none;">
 
       <div class="timer-row">
         <div>
@@ -1411,6 +1415,19 @@
   </div>
 </div>
 
+<!-- MODAL: agregar páginas a un patrón existente -->
+<div class="modal-overlay" id="modal-add-pages">
+  <div class="modal-box">
+    <h3>Agregar páginas al patrón</h3>
+    <p style="margin:0 0 16px; font-size:13.5px; color:var(--text-muted);">Se agregan al final, después de la última página que ya tiene este patrón.</p>
+    <div class="modal-actions" style="flex-direction:column; gap:10px;">
+      <button class="confirm" id="btn-add-pages-photos" style="width:100%;">📷 Elegir fotos</button>
+      <button class="confirm" id="btn-add-pages-pdf" style="width:100%;">📄 Elegir archivo PDF</button>
+      <button class="cancel" id="modal-add-pages-cancel" style="width:100%;">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: renombrar contador 2 -->
 <div class="modal-overlay" id="modal-counter2-label">
   <div class="modal-box">
@@ -1426,6 +1443,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -1478,6 +1496,15 @@ async function dbDelete(id){
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
     tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function dbPut(record){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(record);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -1788,6 +1815,98 @@ async function buildPdfFromScanPages(pages){
   });
   return doc.output('arraybuffer');
 }
+
+/* ---------------- Agregar páginas a un patrón ya guardado ---------------- */
+function uint8ToArrayBuffer(u8){
+  return u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength);
+}
+
+function loadImageFile(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve({ dataUrl: reader.result, width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function buildPdfFromImageFiles(files){
+  const pages = [];
+  for(const file of files){
+    pages.push(await loadImageFile(file));
+  }
+  return buildPdfFromScanPages(pages);
+}
+
+async function mergePdfBuffers(existingBuffer, newBuffer){
+  const { PDFDocument } = PDFLib;
+  const mainDoc = await PDFDocument.load(existingBuffer);
+  const addedCountBefore = mainDoc.getPageCount();
+  const addDoc = await PDFDocument.load(newBuffer);
+  const copiedPages = await mainDoc.copyPages(addDoc, addDoc.getPageIndices());
+  copiedPages.forEach(p => mainDoc.addPage(p));
+  const bytes = await mainDoc.save();
+  return { buffer: uint8ToArrayBuffer(bytes), addedCount: mainDoc.getPageCount() - addedCountBefore };
+}
+
+async function addPagesToCurrentPattern(newBuffer){
+  const statusEl = document.getElementById('add-pages-status');
+  if(!currentPatternId || currentPatternId === 'free'){
+    statusEl.textContent = '⚠️ Abre un patrón con PDF para poder agregarle páginas.';
+    return;
+  }
+  statusEl.textContent = 'Agregando páginas...';
+  try{
+    const record = await dbGet(currentPatternId);
+    if(!record){ statusEl.textContent = '⚠️ No se encontró el patrón.'; return; }
+    const { buffer, addedCount } = await mergePdfBuffers(record.pdfBuffer, newBuffer);
+    record.pdfBuffer = buffer;
+    await dbPut(record);
+    const totalPagesBefore = pdfDoc ? pdfDoc.numPages : 0;
+    await openPattern(currentPatternId);
+    currentProgress.page = totalPagesBefore + 1;
+    if(currentProgress.page > pdfDoc.numPages) currentProgress.page = pdfDoc.numPages;
+    await renderPage();
+    statusEl.textContent = '✅ Se agregaron ' + addedCount + ' página' + (addedCount === 1 ? '' : 's') + '. Ahora tiene ' + pdfDoc.numPages + ' en total.';
+  }catch(e){
+    statusEl.textContent = '⚠️ No se pudo agregar. Revisa que el PDF no esté dañado o protegido.';
+  }
+}
+
+document.getElementById('btn-add-pages').addEventListener('click', () => {
+  document.getElementById('add-pages-status').textContent = '';
+  document.getElementById('modal-add-pages').classList.add('active');
+});
+document.getElementById('modal-add-pages-cancel').addEventListener('click', () => {
+  document.getElementById('modal-add-pages').classList.remove('active');
+});
+document.getElementById('btn-add-pages-photos').addEventListener('click', () => {
+  document.getElementById('modal-add-pages').classList.remove('active');
+  document.getElementById('add-pages-images-input').click();
+});
+document.getElementById('btn-add-pages-pdf').addEventListener('click', () => {
+  document.getElementById('modal-add-pages').classList.remove('active');
+  document.getElementById('add-pages-pdf-input').click();
+});
+document.getElementById('add-pages-images-input').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  if(files.length === 0) return;
+  const newBuffer = await buildPdfFromImageFiles(files);
+  await addPagesToCurrentPattern(newBuffer);
+});
+document.getElementById('add-pages-pdf-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const newBuffer = await file.arrayBuffer();
+  await addPagesToCurrentPattern(newBuffer);
+});
 
 /* ---------------- Borrar patrón ---------------- */
 let pendingDeleteId = null;
