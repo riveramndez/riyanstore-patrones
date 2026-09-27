@@ -1234,7 +1234,12 @@
         <div class="wm-preview-wrap" style="margin-top:10px;">
           <canvas id="compress-preview-canvas" style="max-width:100%; display:block;"></canvas>
         </div>
-        <button class="add-btn" id="btn-compress-download" style="margin-top:14px;"><span class="plus">⬇️</span> Descargar foto comprimida</button>
+        <div class="cost-row" style="margin-top:12px;">
+          <label>Nombre del archivo</label>
+        </div>
+        <input type="text" id="compress-filename" placeholder="ej. enfermera-ramo-reversible-1" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:4px;">
+        <p class="scan-hint" style="margin:0 0 10px;">Sin espacios ni acentos si la vas a usar para el catálogo (ej. usa "-" en vez de espacios).</p>
+        <button class="add-btn" id="btn-compress-download" style="margin-top:4px;"><span class="plus">⬇️</span> Descargar foto comprimida</button>
       </div>
     </div>
   </div>
@@ -4544,6 +4549,7 @@ let compressState = { img: null, originalSize: 0, fileName: 'foto' };
 
 document.getElementById('btn-open-compress').addEventListener('click', () => {
   document.getElementById('compress-controls').style.display = 'none';
+  document.getElementById('compress-filename').value = '';
   compressState = { img: null, originalSize: 0, fileName: 'foto' };
   showScreen('compress-home');
 });
@@ -4559,6 +4565,7 @@ document.getElementById('compress-photo-input').addEventListener('change', (e) =
   if(!file) return;
   compressState.originalSize = file.size;
   compressState.fileName = (file.name || 'foto').replace(/\.[^.]+$/, '') || 'foto';
+  document.getElementById('compress-filename').value = compressState.fileName;
   const reader = new FileReader();
   reader.onload = () => {
     const img = new Image();
@@ -4599,12 +4606,14 @@ document.getElementById('btn-compress-download').addEventListener('click', () =>
   if(!compressState.img) return;
   const canvas = document.getElementById('compress-preview-canvas');
   const quality = parseInt(document.getElementById('compress-quality').value, 10) / 100;
+  const typedName = document.getElementById('compress-filename').value.trim();
+  const finalName = (typedName || compressState.fileName || 'foto') + '.jpg';
   canvas.toBlob((blob) => {
     if(!blob) return;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = compressState.fileName + '-comprimida.jpg';
+    a.download = finalName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
