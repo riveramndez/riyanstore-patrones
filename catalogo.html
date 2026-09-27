@@ -8,12 +8,12 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Riyan Store · Catálogo">
 <meta property="og:description" content="Amigurumis tejidos a mano. Mira nuestros productos y pide por WhatsApp.">
-<meta property="og:image" content="https://riyanstore-patrones.pages.dev/imagenes/logo.png">
+<meta property="og:image" content="https://riyanstore-patrones.pages.dev/imagenes/logo.jpg">
 <meta property="og:url" content="https://riyanstore-patrones.pages.dev/catalogo">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Riyan Store · Catálogo">
 <meta name="twitter:description" content="Amigurumis tejidos a mano. Mira nuestros productos y pide por WhatsApp.">
-<meta name="twitter:image" content="https://riyanstore-patrones.pages.dev/imagenes/logo.png">
+<meta name="twitter:image" content="https://riyanstore-patrones.pages.dev/imagenes/logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -63,6 +63,14 @@
     text-decoration:none;
     font-weight:600;
     font-size:14px;
+  }
+  .store-logo{
+    width:72px;
+    height:72px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--border);
+    margin-bottom:10px;
   }
   .search-wrap{
     padding:16px 20px 0;
@@ -283,6 +291,7 @@
 </head>
 <body>
   <header>
+    <img class="store-logo" id="store-logo" src="imagenes/logo.jpg" alt="Logo" onerror="this.style.display='none'">
     <h1 id="store-name">Catálogo</h1>
     <p id="store-sub">Toca un producto para ver más fotos y detalles</p>
     <a class="wa-link" id="store-wa-link" href="#" target="_blank" rel="noopener">📲 Escríbenos por WhatsApp</a>
