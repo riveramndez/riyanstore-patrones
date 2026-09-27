@@ -788,11 +788,16 @@
           <button type="button" class="status-chip" id="toggle-catalog">⭐ En catálogo</button>
         </div>
         <div id="catalog-feed-fields" style="display:none; margin-top:10px;">
-          <p class="scan-hint" style="margin:0 0 8px;">Para exportarlo a Facebook/TikTok necesitas la URL pública de la foto (súbela a tu bucket de Supabase y pega aquí el link).</p>
+          <p class="scan-hint" style="margin:0 0 8px;">Para exportarlo a Facebook/TikTok necesitas la URL pública de la foto (súbela a tu repo de GitHub y pega aquí el link).</p>
           <div class="cost-row">
-            <label>URL de la foto (pública)</label>
+            <label>URL de la foto principal (pública)</label>
           </div>
-          <input type="text" id="cost-catalog-image-url" placeholder="https://...supabase.co/.../foto.jpg" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+          <input type="text" id="cost-catalog-image-url" placeholder="https://riyanstore-patrones.pages.dev/imagenes/foto.jpg" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+          <div class="cost-row">
+            <label>Fotos adicionales (opcional)</label>
+          </div>
+          <p class="scan-hint" style="margin:0 0 6px;">Una URL por línea. Se muestran como galería extra en el producto (aparte de la principal de arriba).</p>
+          <textarea id="cost-catalog-extra-images" placeholder="https://riyanstore-patrones.pages.dev/imagenes/foto2.jpg&#10;https://riyanstore-patrones.pages.dev/imagenes/foto3.jpg" style="min-height:56px; width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;"></textarea>
           <div class="cost-row">
             <label>Descripción (opcional)</label>
           </div>
@@ -1069,6 +1074,8 @@
     <button class="add-btn" id="btn-catalog-share" style="margin:10px 20px; width:calc(100% - 40px); background:#25D366; color:#0b2b18;">📲 Compartir catálogo por WhatsApp</button>
     <button class="add-btn secondary" id="btn-catalog-export-feed" style="margin:0 20px 10px; width:calc(100% - 40px);">📦 Exportar para Facebook/TikTok</button>
     <p class="scan-hint" id="catalog-feed-status" style="margin:0 20px 10px;"></p>
+    <button class="add-btn secondary" id="btn-catalog-export-public" style="margin:0 20px 10px; width:calc(100% - 40px);">🌐 Exportar catálogo público (para tu página)</button>
+    <p class="scan-hint" id="catalog-public-status" style="margin:0 20px 10px;"></p>
     <div class="catalog-grid" id="catalog-grid"></div>
   </div>
 
@@ -2243,6 +2250,7 @@ function openCostDetail(id){
   document.getElementById('toggle-catalog').classList.toggle('active', !!currentCost.inCatalog);
   document.getElementById('catalog-feed-fields').style.display = currentCost.inCatalog ? 'block' : 'none';
   document.getElementById('cost-catalog-image-url').value = currentCost.catalogImageUrl || '';
+  document.getElementById('cost-catalog-extra-images').value = currentCost.catalogExtraImages || '';
   document.getElementById('cost-catalog-description').value = currentCost.catalogDescription || '';
 
   renderMaterials();
@@ -2450,6 +2458,11 @@ document.getElementById('toggle-catalog').addEventListener('click', () => {
 document.getElementById('cost-catalog-image-url').addEventListener('input', (e) => {
   if(!currentCost) return;
   currentCost.catalogImageUrl = e.target.value.trim();
+  persistCurrentCost();
+});
+document.getElementById('cost-catalog-extra-images').addEventListener('input', (e) => {
+  if(!currentCost) return;
+  currentCost.catalogExtraImages = e.target.value;
   persistCurrentCost();
 });
 document.getElementById('cost-catalog-description').addEventListener('input', (e) => {
@@ -3965,11 +3978,11 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
   const withImage = items.filter(c => c.catalogImageUrl && c.catalogImageUrl.trim());
   const withoutImage = items.length - withImage.length;
   if(withImage.length === 0){
-    statusEl.textContent = '⚠️ Ninguno de tus productos tiene la "URL de la foto (pública)" puesta. Ábrelos, sube su foto a Supabase y pega el link ahí primero.';
+    statusEl.textContent = '⚠️ Ninguno de tus productos tiene la "URL de la foto (pública)" puesta. Ábrelos, sube su foto a GitHub y pega el link ahí primero.';
     return;
   }
 
-  const header = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand'];
+  const header = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'additional_image_link', 'brand'];
   const rows = [header.map(csvEscape).join(',')];
   const brand = getStoreName();
   const waDigits = getStorePhoneDigits();
@@ -3978,6 +3991,12 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
     const price = getCostFinalPrice(c);
     const desc = (c.catalogDescription && c.catalogDescription.trim()) || c.name || 'Amigurumi tejido a mano';
     const link = 'https://wa.me/' + waDigits + '?text=' + encodeURIComponent('Me interesa: ' + (c.name || 'este producto'));
+    const extraImages = (c.catalogExtraImages || '')
+      .split(/\r?\n|,/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0, 10)
+      .join(',');
     const row = [
       c.id,
       c.name || 'Producto',
@@ -3987,6 +4006,7 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
       price.toFixed(2) + ' MXN',
       link,
       c.catalogImageUrl.trim(),
+      extraImages,
       brand
     ];
     rows.push(row.map(csvEscape).join(','));
@@ -4004,6 +4024,54 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
   setTimeout(() => URL.revokeObjectURL(url), 3000);
 
   statusEl.textContent = '✅ CSV descargado con ' + withImage.length + ' producto' + (withImage.length === 1 ? '' : 's') + '.' +
+    (withoutImage > 0 ? ' ⚠️ ' + withoutImage + ' producto' + (withoutImage === 1 ? '' : 's') + ' se quedó fuera por no tener URL de foto.' : '');
+});
+
+document.getElementById('btn-catalog-export-public').addEventListener('click', () => {
+  const statusEl = document.getElementById('catalog-public-status');
+  const items = loadCosts().filter(c => c.inCatalog).sort((a, b) => b.createdAt - a.createdAt);
+  const withImage = items.filter(c => c.catalogImageUrl && c.catalogImageUrl.trim());
+  const withoutImage = items.length - withImage.length;
+  if(withImage.length === 0){
+    statusEl.textContent = '⚠️ Ninguno de tus productos tiene la "URL de la foto (pública)" puesta.';
+    return;
+  }
+  const waDigits = getStorePhoneDigits();
+  const products = withImage.map(c => {
+    const price = getCostFinalPrice(c);
+    const extraImages = (c.catalogExtraImages || '')
+      .split(/\r?\n|,/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0, 10);
+    return {
+      id: c.id,
+      name: c.name || 'Producto',
+      description: (c.catalogDescription && c.catalogDescription.trim()) || '',
+      price: Math.round(price * 100) / 100,
+      image: c.catalogImageUrl.trim(),
+      images: extraImages,
+      whatsappLink: 'https://wa.me/' + waDigits + '?text=' + encodeURIComponent('Me interesa: ' + (c.name || 'este producto'))
+    };
+  });
+  const data = {
+    storeName: getStoreName(),
+    storePhoneDisplay: getStorePhoneDisplay(),
+    storePhoneDigits: waDigits,
+    updatedAt: new Date().toISOString(),
+    products: products
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'catalogo.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+  statusEl.textContent = '✅ Descargado catalogo.json con ' + products.length + ' producto' + (products.length === 1 ? '' : 's') + '. Súbelo a GitHub junto con tu página de catálogo (catalogo.html).' +
     (withoutImage > 0 ? ' ⚠️ ' + withoutImage + ' producto' + (withoutImage === 1 ? '' : 's') + ' se quedó fuera por no tener URL de foto.' : '');
 });
 
