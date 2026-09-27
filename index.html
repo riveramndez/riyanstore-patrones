@@ -1136,6 +1136,14 @@
           <label>WhatsApp (10 dígitos)</label>
           <input type="tel" id="settings-store-phone" style="width:150px;">
         </div>
+        <div class="cost-row" style="display:block;">
+          <label style="display:block; margin-bottom:6px;">Descripción para tu catálogo público</label>
+          <textarea id="settings-catalog-description" rows="4" placeholder="Ej. Descubre la magia de Riyan Store, donde encontrarás hermosos amigurumis 100% hechos a mano con amor..." style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;"></textarea>
+        </div>
+        <div class="cost-row" style="display:block;">
+          <label style="display:block; margin-bottom:6px;">Horario de atención (una línea por día)</label>
+          <textarea id="settings-catalog-hours" rows="3" placeholder="Lunes a viernes: 9:00 a.m. – 5:00 p.m.&#10;Sábado: 9:00 a.m. – 5:00 p.m.&#10;Domingo: Cerrado" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;"></textarea>
+        </div>
         <button class="add-btn" id="btn-save-settings" style="margin-top:14px;">Guardar</button>
         <p class="scan-hint" id="settings-status" style="margin-top:8px;"></p>
       </div>
@@ -4182,6 +4190,8 @@ document.getElementById('btn-catalog-export-public').addEventListener('click', (
     storeName: getStoreName(),
     storePhoneDisplay: getStorePhoneDisplay(),
     storePhoneDigits: waDigits,
+    storeDescription: getStoreCatalogDescription(),
+    storeHours: getStoreCatalogHours(),
     updatedAt: new Date().toISOString(),
     products: products
   };
@@ -4400,6 +4410,8 @@ async function renderStats(){
 const STORE_NAME_KEY = 'amigurumi_store_name';
 const STORE_PHONE_KEY = 'amigurumi_store_phone';
 const HOURS_PER_DAY_KEY = 'amigurumi_hours_per_day';
+const STORE_CATALOG_DESC_KEY = 'amigurumi_store_catalog_description';
+const STORE_CATALOG_HOURS_KEY = 'amigurumi_store_catalog_hours';
 
 function getStoreName(){
   return localStorage.getItem(STORE_NAME_KEY) || 'Riyan Store';
@@ -4417,6 +4429,12 @@ function getHoursPerDay(){
   const v = parseFloat(localStorage.getItem(HOURS_PER_DAY_KEY));
   return (v && v > 0) ? v : 6;
 }
+function getStoreCatalogDescription(){
+  return localStorage.getItem(STORE_CATALOG_DESC_KEY) || '';
+}
+function getStoreCatalogHours(){
+  return localStorage.getItem(STORE_CATALOG_HOURS_KEY) || '';
+}
 function applyStoreBranding(){
   document.getElementById('brand-name-el').textContent = getStoreName();
   document.getElementById('brand-contact-el').textContent = 'WhatsApp ' + getStorePhoneDisplay();
@@ -4427,6 +4445,8 @@ function applyStoreBranding(){
 document.getElementById('btn-open-settings').addEventListener('click', () => {
   document.getElementById('settings-store-name').value = getStoreName();
   document.getElementById('settings-store-phone').value = localStorage.getItem(STORE_PHONE_KEY) || '5664527042';
+  document.getElementById('settings-catalog-description').value = getStoreCatalogDescription();
+  document.getElementById('settings-catalog-hours').value = getStoreCatalogHours();
   document.getElementById('settings-hours-per-day').value = getHoursPerDay();
   document.getElementById('settings-telegram-token').value = localStorage.getItem(TELEGRAM_TOKEN_KEY) || '';
   document.getElementById('settings-telegram-chat-id').value = localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '';
@@ -4459,8 +4479,12 @@ document.getElementById('btn-settings-back').addEventListener('click', () => {
 document.getElementById('btn-save-settings').addEventListener('click', () => {
   const name = document.getElementById('settings-store-name').value.trim();
   const phone = document.getElementById('settings-store-phone').value.trim();
+  const catalogDesc = document.getElementById('settings-catalog-description').value.trim();
+  const catalogHours = document.getElementById('settings-catalog-hours').value.trim();
   if(name) localStorage.setItem(STORE_NAME_KEY, name);
   if(phone) localStorage.setItem(STORE_PHONE_KEY, phone);
+  localStorage.setItem(STORE_CATALOG_DESC_KEY, catalogDesc);
+  localStorage.setItem(STORE_CATALOG_HOURS_KEY, catalogHours);
   applyStoreBranding();
   document.getElementById('settings-status').textContent = '✅ Guardado.';
 });
