@@ -1,0 +1,17 @@
+{
+  "storeName": "Riyan Store",
+  "storePhoneDisplay": "5664527042",
+  "storePhoneDigits": "525664527042",
+  "updatedAt": "2026-09-27T10:10:16.357Z",
+  "products": [
+    {
+      "id": "c2708aee-067d-46c2-a4b7-805b63dc231d",
+      "name": "Marino",
+      "description": "",
+      "price": 750,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/marino1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Marino"
+    }
+  ]
+}
