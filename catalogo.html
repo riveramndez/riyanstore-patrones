@@ -39,6 +39,14 @@
     font-family:var(--font-ui);
     -webkit-font-smoothing:antialiased;
   }
+  img{
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    user-drag:none;
+    pointer-events:auto;
+  }
   header{
     padding:28px 20px 20px;
     text-align:center;
@@ -339,6 +347,14 @@
 let allProducts = [];
 let storePhoneDigits = '';
 
+/* Bloqueo básico de guardado de fotos: evita menú contextual y arrastrar/soltar en imágenes. No evita capturas de pantalla (eso ningún sitio puede impedirlo). */
+document.addEventListener('contextmenu', (e) => {
+  if(e.target && e.target.tagName === 'IMG') e.preventDefault();
+});
+document.addEventListener('dragstart', (e) => {
+  if(e.target && e.target.tagName === 'IMG') e.preventDefault();
+});
+
 function formatPrice(n){
   return '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MXN';
 }
@@ -356,7 +372,7 @@ function renderGrid(products){
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML =
-      '<div class="card-img-wrap"><img src="' + p.image + '" alt="' + escapeHtml(p.name) + '" loading="lazy"></div>' +
+      '<div class="card-img-wrap"><img src="' + p.image + '" alt="' + escapeHtml(p.name) + '" loading="lazy" draggable="false"></div>' +
       '<div class="card-body">' +
         '<p class="card-name">' + escapeHtml(p.name) + '</p>' +
         '<p class="card-price">' + formatPrice(p.price) + '</p>' +
@@ -390,7 +406,7 @@ function openModal(p){
   const overlay = document.getElementById('modal-overlay');
   const gallery = document.getElementById('modal-gallery');
   const allImages = [p.image].concat(Array.isArray(p.images) ? p.images : []);
-  gallery.innerHTML = allImages.map(src => '<img src="' + src + '" alt="' + escapeHtml(p.name) + '" loading="lazy">').join('');
+  gallery.innerHTML = allImages.map(src => '<img src="' + src + '" alt="' + escapeHtml(p.name) + '" loading="lazy" draggable="false">').join('');
   Array.from(gallery.querySelectorAll('img')).forEach(imgEl => {
     imgEl.addEventListener('click', () => openLightbox(imgEl.src, imgEl.alt));
   });
