@@ -1144,6 +1144,11 @@
           <label style="display:block; margin-bottom:6px;">Horario de atención (una línea por día)</label>
           <textarea id="settings-catalog-hours" rows="3" placeholder="Lunes a viernes: 9:00 a.m. – 5:00 p.m.&#10;Sábado: 9:00 a.m. – 5:00 p.m.&#10;Domingo: Cerrado" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;"></textarea>
         </div>
+        <div class="cost-row" style="display:block;">
+          <label style="display:block; margin-bottom:6px;">Link de tu catálogo público</label>
+          <input type="text" id="settings-catalog-url" placeholder="https://riyanstore-patrones.pages.dev/catalogo" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;">
+          <p class="scan-hint" style="margin:6px 0 0;">Es el link de tu página catalogo.html. Se usa en "Compartir catálogo por WhatsApp" para mandar la tarjeta con miniatura en vez de solo texto.</p>
+        </div>
         <button class="add-btn" id="btn-save-settings" style="margin-top:14px;">Guardar</button>
         <p class="scan-hint" id="settings-status" style="margin-top:8px;"></p>
       </div>
@@ -4083,11 +4088,19 @@ function renderCatalog(){
 document.getElementById('btn-catalog-share').addEventListener('click', () => {
   const items = loadCosts().filter(c => c.inCatalog).sort((a, b) => b.createdAt - a.createdAt);
   if(items.length === 0) return;
-  let msg = '🧶 *Catálogo ' + getStoreName() + '* 🧶\n\n';
-  items.forEach(c => {
-    msg += '• ' + (c.name || 'Producto') + ' — ' + money(getCostFinalPrice(c)) + '\n';
-  });
-  msg += '\nEscríbeme para hacer tu pedido 💕';
+  const catalogUrl = getStoreCatalogUrl();
+  let msg;
+  if(catalogUrl){
+    msg = '🧶 *Catálogo ' + getStoreName() + '* 🧶\n\n' +
+      'Mira todos nuestros productos con foto y precio, y pide el que más te guste directo por WhatsApp:\n' +
+      catalogUrl;
+  } else {
+    msg = '🧶 *Catálogo ' + getStoreName() + '* 🧶\n\n';
+    items.forEach(c => {
+      msg += '• ' + (c.name || 'Producto') + ' — ' + money(getCostFinalPrice(c)) + '\n';
+    });
+    msg += '\nEscríbeme para hacer tu pedido 💕';
+  }
   const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
 });
@@ -4412,6 +4425,7 @@ const STORE_PHONE_KEY = 'amigurumi_store_phone';
 const HOURS_PER_DAY_KEY = 'amigurumi_hours_per_day';
 const STORE_CATALOG_DESC_KEY = 'amigurumi_store_catalog_description';
 const STORE_CATALOG_HOURS_KEY = 'amigurumi_store_catalog_hours';
+const STORE_CATALOG_URL_KEY = 'amigurumi_store_catalog_url';
 
 function getStoreName(){
   return localStorage.getItem(STORE_NAME_KEY) || 'Riyan Store';
@@ -4435,6 +4449,9 @@ function getStoreCatalogDescription(){
 function getStoreCatalogHours(){
   return localStorage.getItem(STORE_CATALOG_HOURS_KEY) || '';
 }
+function getStoreCatalogUrl(){
+  return localStorage.getItem(STORE_CATALOG_URL_KEY) || '';
+}
 function applyStoreBranding(){
   document.getElementById('brand-name-el').textContent = getStoreName();
   document.getElementById('brand-contact-el').textContent = 'WhatsApp ' + getStorePhoneDisplay();
@@ -4447,6 +4464,7 @@ document.getElementById('btn-open-settings').addEventListener('click', () => {
   document.getElementById('settings-store-phone').value = localStorage.getItem(STORE_PHONE_KEY) || '5664527042';
   document.getElementById('settings-catalog-description').value = getStoreCatalogDescription();
   document.getElementById('settings-catalog-hours').value = getStoreCatalogHours();
+  document.getElementById('settings-catalog-url').value = getStoreCatalogUrl();
   document.getElementById('settings-hours-per-day').value = getHoursPerDay();
   document.getElementById('settings-telegram-token').value = localStorage.getItem(TELEGRAM_TOKEN_KEY) || '';
   document.getElementById('settings-telegram-chat-id').value = localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '';
@@ -4481,10 +4499,12 @@ document.getElementById('btn-save-settings').addEventListener('click', () => {
   const phone = document.getElementById('settings-store-phone').value.trim();
   const catalogDesc = document.getElementById('settings-catalog-description').value.trim();
   const catalogHours = document.getElementById('settings-catalog-hours').value.trim();
+  const catalogUrl = document.getElementById('settings-catalog-url').value.trim();
   if(name) localStorage.setItem(STORE_NAME_KEY, name);
   if(phone) localStorage.setItem(STORE_PHONE_KEY, phone);
   localStorage.setItem(STORE_CATALOG_DESC_KEY, catalogDesc);
   localStorage.setItem(STORE_CATALOG_HOURS_KEY, catalogHours);
+  localStorage.setItem(STORE_CATALOG_URL_KEY, catalogUrl);
   applyStoreBranding();
   document.getElementById('settings-status').textContent = '✅ Guardado.';
 });
