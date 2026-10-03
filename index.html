@@ -187,9 +187,41 @@
   .canvas-wrap{
     flex:1; overflow:auto;
     display:block;
+    position:relative;
     padding:14px 10px 220px;
     background:
       repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 14px);
+  }
+  .page-marker{
+    display:none;
+    position:absolute;
+    width:26px; height:26px;
+    margin-left:-13px; margin-top:-13px;
+    z-index:5;
+    cursor:pointer;
+  }
+  .page-marker::before{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:rgba(217,105,90,0.35);
+    animation:marker-pulse 1.6s ease-out infinite;
+  }
+  .page-marker::after{
+    content:'📍';
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-58%);
+    font-size:20px;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  }
+  @keyframes marker-pulse{
+    0%{ transform:scale(0.6); opacity:0.9; }
+    100%{ transform:scale(1.8); opacity:0; }
+  }
+  #btn-mark-place.active{
+    background:var(--accent-2, #D9695A);
+    color:#fff;
   }
   #pdf-canvas{
     display:block;
@@ -666,13 +698,17 @@
         <button class="icon-btn" id="btn-next-page" style="width:32px;height:32px;font-size:13px;">›</button>
       </div>
       <div class="zoom-group">
+        <button class="icon-btn" id="btn-mark-place" style="width:32px;height:32px;font-size:15px;" title="Marcar dónde me quedé">📍</button>
         <button class="icon-btn" id="btn-zoom-out" style="width:32px;height:32px;font-size:15px;">−</button>
         <button class="icon-btn" id="btn-zoom-in" style="width:32px;height:32px;font-size:15px;">+</button>
       </div>
     </div>
 
+    <p class="scan-hint" id="mark-place-hint" style="display:none; text-align:center; margin:8px 20px 0; color:var(--accent-2);">👆 Toca el patrón donde te quedaste para poner tu marca</p>
+
     <div class="canvas-wrap" id="canvas-wrap">
       <canvas id="pdf-canvas"></canvas>
+      <div class="page-marker" id="page-marker" title="Toca para quitar la marca"></div>
       <div class="canvas-placeholder" id="canvas-placeholder" style="display:none;">
         <div style="font-size:40px; margin-bottom:8px;">🧵</div>
         <p>Sin patrón — tejiendo de memoria.<br>Usa el contador y el cronómetro de abajo.</p>
@@ -1548,7 +1584,8 @@ function defaultProgress(){
     hasCounter2: false, counter2Label: 'Contador 2', counter2: 0,
     elapsedSeconds: 0,
     notes: '',
-    estimatedHours: null
+    estimatedHours: null,
+    marker: null // { page, xPct, yPct } — dónde se quedó dentro del patrón
   };
 }
 
@@ -1572,7 +1609,7 @@ function renderResumeCard(patterns){
   if(!isFree && !patternRecord){ wrap.innerHTML = ''; return; } // el patrón fue borrado
 
   const name = isFree ? 'Contador libre' : patternRecord.name;
-  const meta = 'Vuelta ' + (best.prog.vueltas || 0) + ' · ' + formatTime(best.prog.elapsedSeconds || 0);
+  const meta = 'Vuelta ' + (best.prog.vueltas || 0) + ' · ' + formatTime(best.prog.elapsedSeconds || 0) + (best.prog.marker ? ' · 📍 con marca' : '');
 
   wrap.innerHTML =
     '<div class="resume-card" id="resume-card-btn">' +
@@ -1947,6 +1984,8 @@ function setViewerFreeMode(isFree){
   document.querySelector('.zoom-group').style.display = isFree ? 'none' : '';
   document.getElementById('pdf-canvas').style.display = isFree ? 'none' : '';
   document.getElementById('canvas-placeholder').style.display = isFree ? 'flex' : 'none';
+  setMarkPlaceMode(false);
+  if(isFree) document.getElementById('page-marker').style.display = 'none';
 }
 
 async function openPattern(id){
@@ -1987,6 +2026,7 @@ document.getElementById('btn-back').addEventListener('click', () => {
   persistProgress();
   pdfDoc = null;
   currentPatternId = null;
+  setMarkPlaceMode(false);
   releaseWakeLock();
   renderHome();
   showScreen('home');
@@ -2017,8 +2057,54 @@ async function renderPage(){
   await page.render({ canvasContext: ctx, viewport, transform }).promise;
 
   document.getElementById('page-indicator').textContent = currentProgress.page + '/' + pdfDoc.numPages;
+  renderMarkerOverlay();
   persistProgress();
 }
+
+/* ---------------- Marca de "dónde me quedé" ---------------- */
+let markPlaceMode = false;
+
+function renderMarkerOverlay(){
+  const markerEl = document.getElementById('page-marker');
+  const canvas = document.getElementById('pdf-canvas');
+  const m = currentProgress && currentProgress.marker;
+  if(!m || !pdfDoc || m.page !== currentProgress.page){
+    markerEl.style.display = 'none';
+    return;
+  }
+  markerEl.style.left = (canvas.offsetLeft + m.xPct * canvas.clientWidth) + 'px';
+  markerEl.style.top = (canvas.offsetTop + m.yPct * canvas.clientHeight) + 'px';
+  markerEl.style.display = 'block';
+}
+
+function setMarkPlaceMode(on){
+  markPlaceMode = on;
+  document.getElementById('btn-mark-place').classList.toggle('active', on);
+  document.getElementById('mark-place-hint').style.display = on ? 'block' : 'none';
+}
+
+document.getElementById('btn-mark-place').addEventListener('click', () => {
+  setMarkPlaceMode(!markPlaceMode);
+});
+
+document.getElementById('pdf-canvas').addEventListener('click', (e) => {
+  if(!markPlaceMode || !pdfDoc) return;
+  const canvas = document.getElementById('pdf-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const xPct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+  const yPct = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+  currentProgress.marker = { page: currentProgress.page, xPct, yPct };
+  setMarkPlaceMode(false);
+  renderMarkerOverlay();
+  persistProgress();
+});
+
+document.getElementById('page-marker').addEventListener('click', (e) => {
+  e.stopPropagation();
+  currentProgress.marker = null;
+  renderMarkerOverlay();
+  persistProgress();
+});
 
 document.getElementById('btn-prev-page').addEventListener('click', () => {
   if(!pdfDoc || currentProgress.page <= 1) return;
