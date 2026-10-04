@@ -828,16 +828,24 @@
           <button type="button" class="status-chip" id="toggle-catalog">⭐ En catálogo</button>
         </div>
         <div id="catalog-feed-fields" style="display:none; margin-top:10px;">
-          <p class="scan-hint" style="margin:0 0 8px;">Para exportarlo a Facebook/TikTok necesitas la URL pública de la foto (súbela a tu repo de GitHub y pega aquí el link).</p>
+          <p class="scan-hint" style="margin:0 0 8px;">Para exportarlo a Facebook/TikTok y a tu catálogo público, la foto debe estar subida a tu carpeta <code>imagenes/</code> en GitHub. Solo escribe el <b>nombre del archivo</b> (sin la parte repetida del link) — la app arma el link completo sola.</p>
           <div class="cost-row">
-            <label>URL de la foto principal (pública)</label>
+            <label>Nombre de la foto principal</label>
           </div>
-          <input type="text" id="cost-catalog-image-url" placeholder="https://riyanstore-patrones.pages.dev/imagenes/foto.jpg" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;">
+          <input type="text" id="cost-catalog-image-url" placeholder="Ej. marino1 (o marino1.png si no es .jpg)" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;">
+          <div id="cost-image-preview-wrap" style="display:none; align-items:center; gap:10px; margin:8px 0 10px;">
+            <img id="cost-image-preview" style="width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+            <span id="cost-image-preview-status" class="scan-hint" style="margin:0;"></span>
+          </div>
           <div class="cost-row">
             <label>Fotos adicionales (opcional)</label>
           </div>
-          <p class="scan-hint" style="margin:0 0 6px;">Una URL por línea. Se muestran como galería extra en el producto (aparte de la principal de arriba).</p>
-          <textarea id="cost-catalog-extra-images" placeholder="https://riyanstore-patrones.pages.dev/imagenes/foto2.jpg&#10;https://riyanstore-patrones.pages.dev/imagenes/foto3.jpg" style="min-height:56px; width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;"></textarea>
+          <p class="scan-hint" style="margin:0 0 6px;">Escribe el nombre de la foto y toca "Agregar" — se va sumando a la lista. También puedes escribir varios nombres a mano, uno por línea.</p>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" id="cost-extra-image-add-input" placeholder="Ej. marino2" style="flex:1; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;">
+            <button type="button" class="add-counter-btn" id="btn-add-extra-image" style="white-space:nowrap;">➕ Agregar</button>
+          </div>
+          <textarea id="cost-catalog-extra-images" placeholder="marino2&#10;marino3" style="min-height:56px; width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:10px;"></textarea>
           <div class="cost-row">
             <label>Descripción (opcional)</label>
           </div>
@@ -1184,6 +1192,11 @@
           <label style="display:block; margin-bottom:6px;">Link de tu catálogo público</label>
           <input type="text" id="settings-catalog-url" placeholder="https://riyanstore-patrones.pages.dev/catalogo" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;">
           <p class="scan-hint" style="margin:6px 0 0;">Es el link de tu página catalogo.html. Se usa en "Compartir catálogo por WhatsApp" para mandar la tarjeta con miniatura en vez de solo texto.</p>
+        </div>
+        <div class="cost-row" style="display:block;">
+          <label style="display:block; margin-bottom:6px;">Carpeta de tus imágenes en GitHub</label>
+          <input type="text" id="settings-image-base-url" placeholder="https://riyanstore-patrones.pages.dev/imagenes/" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px;">
+          <p class="scan-hint" style="margin:6px 0 0;">Con esto, en las fotos de catálogo de cada producto solo escribes el nombre del archivo (ej. "marino1") y la app arma el link completo sola.</p>
         </div>
         <button class="add-btn" id="btn-save-settings" style="margin-top:14px;">Guardar</button>
         <p class="scan-hint" id="settings-status" style="margin-top:8px;"></p>
@@ -2475,6 +2488,7 @@ function openCostDetail(id){
   document.getElementById('cost-catalog-image-url').value = currentCost.catalogImageUrl || '';
   document.getElementById('cost-catalog-extra-images').value = currentCost.catalogExtraImages || '';
   document.getElementById('cost-catalog-description').value = currentCost.catalogDescription || '';
+  updateCostImagePreview();
 
   renderMaterials();
   renderExtras();
@@ -2682,12 +2696,50 @@ document.getElementById('cost-catalog-image-url').addEventListener('input', (e) 
   if(!currentCost) return;
   currentCost.catalogImageUrl = e.target.value.trim();
   persistCurrentCost();
+  updateCostImagePreview();
 });
 document.getElementById('cost-catalog-extra-images').addEventListener('input', (e) => {
   if(!currentCost) return;
   currentCost.catalogExtraImages = e.target.value;
   persistCurrentCost();
 });
+document.getElementById('btn-add-extra-image').addEventListener('click', () => {
+  if(!currentCost) return;
+  const addInput = document.getElementById('cost-extra-image-add-input');
+  const name = addInput.value.trim();
+  if(!name) return;
+  const textarea = document.getElementById('cost-catalog-extra-images');
+  const current = textarea.value.trim();
+  textarea.value = current ? current + '\n' + name : name;
+  currentCost.catalogExtraImages = textarea.value;
+  persistCurrentCost();
+  addInput.value = '';
+  addInput.focus();
+});
+document.getElementById('cost-extra-image-add-input').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    document.getElementById('btn-add-extra-image').click();
+  }
+});
+let costImagePreviewTimer = null;
+function updateCostImagePreview(){
+  clearTimeout(costImagePreviewTimer);
+  costImagePreviewTimer = setTimeout(() => {
+    const raw = document.getElementById('cost-catalog-image-url').value;
+    const wrap = document.getElementById('cost-image-preview-wrap');
+    const img = document.getElementById('cost-image-preview');
+    const status = document.getElementById('cost-image-preview-status');
+    if(!raw.trim()){ wrap.style.display = 'none'; return; }
+    const url = buildImageUrl(raw);
+    wrap.style.display = 'flex';
+    status.textContent = 'Buscando la foto...';
+    img.style.visibility = 'hidden';
+    img.onload = () => { img.style.visibility = 'visible'; status.textContent = '✅ Encontrada'; };
+    img.onerror = () => { img.style.visibility = 'hidden'; status.textContent = '⚠️ No se encontró esa foto — revisa el nombre o que ya la hayas subido a GitHub.'; };
+    img.src = url;
+  }, 500);
+}
 document.getElementById('cost-catalog-description').addEventListener('input', (e) => {
   if(!currentCost) return;
   currentCost.catalogDescription = e.target.value;
@@ -4227,6 +4279,7 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
       .map(s => s.trim())
       .filter(Boolean)
       .slice(0, 10)
+      .map(buildImageUrl)
       .join(',');
     const row = [
       c.id,
@@ -4236,7 +4289,7 @@ document.getElementById('btn-catalog-export-feed').addEventListener('click', () 
       'new',
       price.toFixed(2) + ' MXN',
       link,
-      c.catalogImageUrl.trim(),
+      buildImageUrl(c.catalogImageUrl),
       extraImages,
       brand
     ];
@@ -4274,13 +4327,14 @@ document.getElementById('btn-catalog-export-public').addEventListener('click', (
       .split(/\r?\n|,/)
       .map(s => s.trim())
       .filter(Boolean)
-      .slice(0, 10);
+      .slice(0, 10)
+      .map(buildImageUrl);
     return {
       id: c.id,
       name: c.name || 'Producto',
       description: (c.catalogDescription && c.catalogDescription.trim()) || '',
       price: Math.round(price * 100) / 100,
-      image: c.catalogImageUrl.trim(),
+      image: buildImageUrl(c.catalogImageUrl),
       images: extraImages,
       whatsappLink: 'https://wa.me/' + waDigits + '?text=' + encodeURIComponent('Me interesa: ' + (c.name || 'este producto'))
     };
@@ -4512,6 +4566,7 @@ const HOURS_PER_DAY_KEY = 'amigurumi_hours_per_day';
 const STORE_CATALOG_DESC_KEY = 'amigurumi_store_catalog_description';
 const STORE_CATALOG_HOURS_KEY = 'amigurumi_store_catalog_hours';
 const STORE_CATALOG_URL_KEY = 'amigurumi_store_catalog_url';
+const STORE_IMAGE_BASE_KEY = 'amigurumi_store_image_base_url';
 
 function getStoreName(){
   return localStorage.getItem(STORE_NAME_KEY) || 'Riyan Store';
@@ -4538,6 +4593,19 @@ function getStoreCatalogHours(){
 function getStoreCatalogUrl(){
   return localStorage.getItem(STORE_CATALOG_URL_KEY) || '';
 }
+function getImageBaseUrl(){
+  const raw = localStorage.getItem(STORE_IMAGE_BASE_KEY) || 'https://riyanstore-patrones.pages.dev/imagenes/';
+  return raw.endsWith('/') ? raw : raw + '/';
+}
+/* Convierte lo que haya escrito la usuaria (solo el nombre del archivo, o ya un link completo) en el link público final. */
+function buildImageUrl(raw){
+  const value = (raw || '').trim();
+  if(!value) return '';
+  if(/^https?:\/\//i.test(value)) return value; // ya es un link completo, se respeta tal cual
+  const hasExtension = /\.[a-zA-Z0-9]{2,5}$/.test(value);
+  const fileName = hasExtension ? value : value + '.jpg';
+  return getImageBaseUrl() + fileName;
+}
 function applyStoreBranding(){
   document.getElementById('brand-name-el').textContent = getStoreName();
   document.getElementById('brand-contact-el').textContent = 'WhatsApp ' + getStorePhoneDisplay();
@@ -4551,6 +4619,7 @@ document.getElementById('btn-open-settings').addEventListener('click', () => {
   document.getElementById('settings-catalog-description').value = getStoreCatalogDescription();
   document.getElementById('settings-catalog-hours').value = getStoreCatalogHours();
   document.getElementById('settings-catalog-url').value = getStoreCatalogUrl();
+  document.getElementById('settings-image-base-url').value = getImageBaseUrl();
   document.getElementById('settings-hours-per-day').value = getHoursPerDay();
   document.getElementById('settings-telegram-token').value = localStorage.getItem(TELEGRAM_TOKEN_KEY) || '';
   document.getElementById('settings-telegram-chat-id').value = localStorage.getItem(TELEGRAM_CHAT_ID_KEY) || '';
@@ -4586,11 +4655,13 @@ document.getElementById('btn-save-settings').addEventListener('click', () => {
   const catalogDesc = document.getElementById('settings-catalog-description').value.trim();
   const catalogHours = document.getElementById('settings-catalog-hours').value.trim();
   const catalogUrl = document.getElementById('settings-catalog-url').value.trim();
+  const imageBaseUrl = document.getElementById('settings-image-base-url').value.trim();
   if(name) localStorage.setItem(STORE_NAME_KEY, name);
   if(phone) localStorage.setItem(STORE_PHONE_KEY, phone);
   localStorage.setItem(STORE_CATALOG_DESC_KEY, catalogDesc);
   localStorage.setItem(STORE_CATALOG_HOURS_KEY, catalogHours);
   localStorage.setItem(STORE_CATALOG_URL_KEY, catalogUrl);
+  if(imageBaseUrl) localStorage.setItem(STORE_IMAGE_BASE_KEY, imageBaseUrl);
   applyStoreBranding();
   document.getElementById('settings-status').textContent = '✅ Guardado.';
 });
