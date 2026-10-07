@@ -440,6 +440,13 @@
     background:var(--surface); border:1px solid var(--border); color:var(--text);
     border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit;
   }
+  .kc-input{
+    width:100%; box-sizing:border-box;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit;
+  }
+  .kc-label{ display:block; font-size:13.5px; margin:14px 0 6px; color:var(--text); }
+  .kc-sub{ margin:6px 0 0; }
   .cost-row input[type="date"]{
     width:150px; background:var(--surface); border:1px solid var(--border);
     color:var(--text); border-radius:10px; padding:9px 10px; font-size:14px;
@@ -668,6 +675,7 @@
     <button class="add-btn secondary costs-entry-btn" id="btn-open-watermark"><span class="plus">🖼️</span> Marca de agua en fotos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-compress"><span class="plus">🗜️</span> Comprimir foto</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-qr"><span class="plus">🔗</span> Generador de código QR</button>
+    <button class="add-btn secondary costs-entry-btn" id="btn-open-keychains"><span class="plus">🔑</span> Llaveros con mensaje (QR)</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-messages"><span class="plus">💬</span> Mensajes rápidos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-backup"><span class="plus">⚙️</span> Respaldo de mis datos</button>
     <button class="add-btn secondary costs-entry-btn" id="btn-open-costs"><span class="plus">🧮</span> Calculadora de costos</button>
@@ -1047,6 +1055,73 @@
       <div class="cost-section">
         <div class="cost-section-title">Notas (opcional)</div>
         <textarea id="qr-notes-input" placeholder="Ej. Para el llavero de resina del pedido de Ana"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYCHAINS (LLAVEROS CON MENSAJE) HOME SCREEN -->
+  <div id="kc-home" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-kc-back-home">‹</button>
+      <div class="viewer-title">Llaveros con mensaje</div>
+    </div>
+    <div class="costs-list-wrap">
+      <button class="add-btn" id="btn-new-kc" style="margin:16px 20px 8px;"><span class="plus">+</span> Nuevo llavero</button>
+      <p class="scan-hint" style="margin:0 20px 8px;">Cada llavero tiene su propio código QR y su propia página con el video, audio, fotos o carta de tu cliente.</p>
+      <div class="pattern-list" id="kc-list"></div>
+    </div>
+  </div>
+
+  <!-- KEYCHAIN DETAIL SCREEN -->
+  <div id="kc-detail" class="screen">
+    <div class="viewer-top">
+      <button class="icon-btn" id="btn-kc-detail-back">‹</button>
+      <input type="text" id="kc-name-input" class="cost-name-input" placeholder="Cliente (ej. Ana)">
+      <button class="icon-btn" id="btn-kc-delete" style="color:var(--danger);">🗑</button>
+    </div>
+    <div class="cost-form">
+      <div class="cost-section">
+        <div class="cost-section-title">Lo que verá tu cliente</div>
+        <input type="text" id="kc-title-input" class="kc-input" placeholder="Un mensaje para ti 💛" style="margin-bottom:10px;">
+        <textarea id="kc-text-input" placeholder="Mensaje o carta (opcional)"></textarea>
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Contenido</div>
+        <p class="scan-hint" style="margin:-4px 0 12px;">Llena solo lo que lleve este llavero. Pega el link completo.</p>
+
+        <label class="kc-label">🎬 Video de YouTube</label>
+        <input type="text" id="kc-video-input" class="kc-input" placeholder="https://youtu.be/...">
+        <p class="scan-hint kc-sub">Debe estar subido como <strong>"No listado"</strong>, no como "Privado" (si no, al cliente le dice que no está disponible).</p>
+
+        <label class="kc-label">🎧 Audio de Google Drive</label>
+        <input type="text" id="kc-audio-input" class="kc-input" placeholder="https://drive.google.com/file/d/...">
+        <p class="scan-hint kc-sub">En Drive: Compartir → Acceso general → <strong>"Cualquier persona con el vínculo"</strong> (Lector).</p>
+
+        <label class="kc-label">📷 Foto o collage (Drive o link de imagen)</label>
+        <input type="text" id="kc-photo-input" class="kc-input" placeholder="https://drive.google.com/file/d/...">
+
+        <label class="kc-label">🎵 Canción (Spotify o YouTube)</label>
+        <input type="text" id="kc-song-input" class="kc-input" placeholder="https://open.spotify.com/track/...">
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Código QR del llavero</div>
+        <div class="wm-preview-wrap" style="display:flex; justify-content:center; padding:20px;">
+          <div id="kc-qr-holder" style="background:#fff; padding:14px; border-radius:8px;"></div>
+        </div>
+        <p class="scan-hint" style="margin:10px 0 0; word-break:break-all;">Código: <strong id="kc-code-label"></strong><br><span id="kc-link-label"></span></p>
+        <p class="scan-hint" style="margin:6px 0 0;">Imprímelo de unos <strong>2 cm</strong> como mínimo para el molde de 3 cm.</p>
+        <button class="add-btn" id="btn-kc-download-qr" style="margin-top:14px;"><span class="plus">⬇️</span> Descargar imagen del QR</button>
+        <button class="add-btn secondary" id="btn-kc-copy-link" style="margin-top:8px;"><span class="plus">📋</span> Copiar link</button>
+      </div>
+
+      <div class="cost-section">
+        <div class="cost-section-title">Publicar el mensaje</div>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Para que el QR funcione, descarga el archivo y súbelo a GitHub dentro de la carpeta <strong>mensajes</strong> (como haces con las fotos de la carpeta imagenes). Cada vez que cambies algo de este llavero, vuelve a descargarlo y subirlo.</p>
+        <button class="add-btn" id="btn-kc-download-json"><span class="plus">📄</span> Descargar archivo del mensaje</button>
+        <button class="add-btn secondary" id="btn-kc-test" style="margin-top:8px;"><span class="plus">🔎</span> Probar cómo se ve</button>
+        <p class="scan-hint" id="kc-status" style="margin:10px 0 0;"></p>
       </div>
     </div>
   </div>
@@ -3809,10 +3884,36 @@ function updateQrPreview(){
     height: 512,
     colorDark: '#1E2A28',
     colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
+    // Nivel M (en vez de H): menos cuadritos, más grandes y fáciles de leer en tamaños chicos (ej. llaveros de resina de 2-3 cm)
+    correctLevel: QRCode.CorrectLevel.M
   });
   const canvas = holder.querySelector('canvas');
   if(canvas){ canvas.style.width = '220px'; canvas.style.height = '220px'; }
+}
+
+/* Devuelve un canvas nuevo con el QR + un margen blanco alrededor (los celulares lo necesitan para detectar bien el código). */
+function qrCanvasWithMargin(srcCanvas, marginRatio){
+  const m = Math.round(srcCanvas.width * (marginRatio || 0.13));
+  const out = document.createElement('canvas');
+  out.width = srcCanvas.width + m * 2;
+  out.height = srcCanvas.height + m * 2;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, out.width, out.height);
+  ctx.drawImage(srcCanvas, m, m);
+  return out;
+}
+function downloadCanvasPng(canvas, filename){
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }, 'image/png');
 }
 
 document.getElementById('qr-name-input').addEventListener('input', (e) => {
@@ -3836,17 +3937,8 @@ document.getElementById('btn-qr-download').addEventListener('click', () => {
   const holder = document.getElementById('qr-canvas-holder');
   const canvas = holder.querySelector('canvas');
   if(!canvas) return;
-  canvas.toBlob((blob) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const safeName = (currentQr.name || 'codigo-qr').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'codigo-qr';
-    a.download = safeName + '.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-  }, 'image/png');
+  const safeName = (currentQr.name || 'codigo-qr').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'codigo-qr';
+  downloadCanvasPng(qrCanvasWithMargin(canvas), safeName + '.png');
 });
 
 document.getElementById('btn-qr-detail-back').addEventListener('click', () => {
@@ -3861,6 +3953,262 @@ document.getElementById('btn-qr-delete').addEventListener('click', () => {
   currentQr = null;
   renderQrHome();
   showScreen('qr-home');
+});
+
+/* ---------------- Llaveros con mensaje (QR → página mensaje.html) ---------------- */
+const KC_KEY = 'amigurumi_keychains_v1';
+const KC_DEFAULT_SITE = 'https://riyanstore-patrones.pages.dev';
+let currentKc = null;
+
+function loadKcs(){
+  try{
+    const raw = localStorage.getItem(KC_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveKcs(list){
+  localStorage.setItem(KC_KEY, JSON.stringify(list));
+}
+function getKc(id){
+  return loadKcs().find(k => k.id === id) || null;
+}
+function updateKc(k){
+  const list = loadKcs();
+  const idx = list.findIndex(x => x.id === k.id);
+  if(idx >= 0) list[idx] = k; else list.push(k);
+  saveKcs(list);
+}
+function touchKc(){
+  if(!currentKc) return;
+  currentKc.updatedAt = Date.now();
+  updateKc(currentKc);
+  updateKcStatus();
+}
+
+// Código aleatorio de 6 caracteres (sin letras confusas como l/1/o/0), que no se pueda adivinar
+function genKcCode(){
+  const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
+  const used = new Set(loadKcs().map(k => k.code));
+  for(let tries = 0; tries < 50; tries++){
+    const bytes = new Uint8Array(6);
+    (window.crypto || window.msCrypto).getRandomValues(bytes);
+    let code = '';
+    for(let i = 0; i < 6; i++) code += alphabet[bytes[i] % alphabet.length];
+    if(!used.has(code)) return code;
+  }
+  return 'k' + Date.now().toString(36).slice(-5);
+}
+function getKcSiteBase(){
+  try{
+    const u = getStoreCatalogUrl();
+    if(u) return new URL(u).origin;
+  }catch(e){}
+  return KC_DEFAULT_SITE;
+}
+function kcLink(k){
+  return getKcSiteBase() + '/mensaje?' + k.code;
+}
+function kcNormUrl(raw){
+  const v = (raw || '').trim();
+  if(!v) return '';
+  if(/^https?:\/\//i.test(v)) return v.replace(/^http:\/\//i, 'https://');
+  return 'https://' + v;
+}
+function kcItems(k){
+  const items = [];
+  const push = (t, u) => { const n = kcNormUrl(u); if(n) items.push({ t, u: n }); };
+  push('video', k.videoUrl);
+  push('photo', k.photoUrl);
+  push('audio', k.audioUrl);
+  push('song', k.songUrl);
+  return items;
+}
+function kcHasYoutube(u){ return /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))[A-Za-z0-9_-]{11}/i.test(u || ''); }
+function kcHasDriveFile(u){ return /drive\.google\.com\/(?:file\/d\/|open\?|uc\?)/i.test(u || ''); }
+function kcHasSpotify(u){ return /open\.spotify\.com\/(?:intl-[a-z]+\/)?(?:track|album|playlist|episode|show)\//i.test(u || ''); }
+// Avisos para que no se quede un link que no va a funcionar
+function kcProblems(k){
+  const p = [];
+  const v = (k.videoUrl || '').trim(), a = (k.audioUrl || '').trim(), ph = (k.photoUrl || '').trim(), s = (k.songUrl || '').trim();
+  if(v && !kcHasYoutube(v) && !kcHasDriveFile(v)) p.push('El link del video no parece de YouTube ni de Drive; se mostrará como botón.');
+  if(a && !kcHasDriveFile(a)) p.push('El audio debe ser un link de archivo de Google Drive; si no, se mostrará como botón.');
+  if(/drive\.google\.com\/drive\/folders/i.test(a + ' ' + ph + ' ' + v)) p.push('Pegaste una carpeta de Drive. Usa el link de un archivo (clic derecho → Compartir → Copiar vínculo).');
+  if(s && !kcHasSpotify(s) && !kcHasYoutube(s)) p.push('La canción no parece de Spotify ni de YouTube; se mostrará como botón.');
+  return p;
+}
+function kcBuildPayload(k){
+  return {
+    code: k.code,
+    title: (k.title || '').trim() || 'Un mensaje para ti 💛',
+    text: (k.text || '').trim(),
+    storeName: getStoreName(),
+    wa: getStorePhoneDigits(),
+    items: kcItems(k),
+    updatedAt: new Date().toISOString()
+  };
+}
+function kcNeedsUpload(k){
+  return !k.exportedAt || (k.updatedAt || 0) > k.exportedAt;
+}
+
+document.getElementById('btn-open-keychains').addEventListener('click', () => {
+  renderKcHome();
+  showScreen('kc-home');
+});
+document.getElementById('btn-kc-back-home').addEventListener('click', () => {
+  showScreen('home');
+});
+
+function renderKcHome(){
+  const list = document.getElementById('kc-list');
+  const kcs = loadKcs().sort((a, b) => b.createdAt - a.createdAt);
+  if(kcs.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🔑</div><p>Aún no tienes llaveros con mensaje. Crea uno por cada pedido que lleve QR.</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  kcs.forEach(k => {
+    const card = document.createElement('div');
+    card.className = 'pattern-card';
+    card.innerHTML =
+      '<div class="thumb">🔑</div>' +
+      '<div class="info"><div class="name"></div><div class="meta"></div></div>' +
+      '<button class="del">✕</button>';
+    card.querySelector('.name').textContent = k.name || 'Llavero sin nombre';
+    const n = kcItems(k).length + ((k.text || '').trim() ? 1 : 0);
+    card.querySelector('.meta').textContent = k.code + ' · ' + n + ' elemento' + (n === 1 ? '' : 's') + (kcNeedsUpload(k) ? ' · 📤 falta subir el archivo' : ' · ✅');
+    card.addEventListener('click', (e) => {
+      if(e.target.closest('.del')) return;
+      openKcDetail(k.id);
+    });
+    card.querySelector('.del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo de la carpeta "mensajes" en GitHub. No se puede deshacer.')){
+        saveKcs(loadKcs().filter(x => x.id !== k.id));
+        renderKcHome();
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('btn-new-kc').addEventListener('click', () => {
+  const now = Date.now();
+  const k = { id: uid(), code: genKcCode(), name: '', title: '', text: '', videoUrl: '', audioUrl: '', photoUrl: '', songUrl: '', createdAt: now, updatedAt: now, exportedAt: 0 };
+  updateKc(k);
+  openKcDetail(k.id);
+});
+
+function updateKcStatus(){
+  const el = document.getElementById('kc-status');
+  if(!el || !currentKc) return;
+  const problems = kcProblems(currentKc);
+  let msg = kcNeedsUpload(currentKc)
+    ? '📤 Falta descargar y subir el archivo de este llavero a GitHub (carpeta mensajes).'
+    : '✅ Archivo descargado. Si ya lo subiste, tu QR funciona.';
+  if(problems.length) msg += '\n⚠️ ' + problems.join('\n⚠️ ');
+  el.style.whiteSpace = 'pre-line';
+  el.textContent = msg;
+}
+
+function renderKcQr(){
+  const holder = document.getElementById('kc-qr-holder');
+  holder.innerHTML = '';
+  new QRCode(holder, {
+    text: kcLink(currentKc),
+    width: 512,
+    height: 512,
+    colorDark: '#000000',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  const canvas = holder.querySelector('canvas');
+  if(canvas){ canvas.style.width = '200px'; canvas.style.height = '200px'; canvas.style.display = 'block'; }
+  const img = holder.querySelector('img');
+  if(img){ img.style.display = 'none'; }
+}
+
+function openKcDetail(id){
+  currentKc = getKc(id);
+  if(!currentKc) return;
+  document.getElementById('kc-name-input').value = currentKc.name || '';
+  document.getElementById('kc-title-input').value = currentKc.title || '';
+  document.getElementById('kc-text-input').value = currentKc.text || '';
+  document.getElementById('kc-video-input').value = currentKc.videoUrl || '';
+  document.getElementById('kc-audio-input').value = currentKc.audioUrl || '';
+  document.getElementById('kc-photo-input').value = currentKc.photoUrl || '';
+  document.getElementById('kc-song-input').value = currentKc.songUrl || '';
+  document.getElementById('kc-code-label').textContent = currentKc.code;
+  document.getElementById('kc-link-label').textContent = kcLink(currentKc);
+  renderKcQr();
+  updateKcStatus();
+  showScreen('kc-detail');
+}
+
+[
+  ['kc-name-input', 'name'],
+  ['kc-title-input', 'title'],
+  ['kc-text-input', 'text'],
+  ['kc-video-input', 'videoUrl'],
+  ['kc-audio-input', 'audioUrl'],
+  ['kc-photo-input', 'photoUrl'],
+  ['kc-song-input', 'songUrl']
+].forEach(([elId, field]) => {
+  document.getElementById(elId).addEventListener('input', (e) => {
+    if(!currentKc) return;
+    currentKc[field] = e.target.value;
+    touchKc();
+  });
+});
+
+document.getElementById('btn-kc-download-qr').addEventListener('click', () => {
+  if(!currentKc) return;
+  const canvas = document.querySelector('#kc-qr-holder canvas');
+  if(!canvas) return;
+  downloadCanvasPng(qrCanvasWithMargin(canvas), 'llavero-' + currentKc.code + '.png');
+});
+document.getElementById('btn-kc-copy-link').addEventListener('click', async () => {
+  if(!currentKc) return;
+  const link = kcLink(currentKc);
+  try{
+    await navigator.clipboard.writeText(link);
+    alert('Link copiado:\n' + link);
+  }catch(e){
+    prompt('Copia este link:', link);
+  }
+});
+document.getElementById('btn-kc-download-json').addEventListener('click', () => {
+  if(!currentKc) return;
+  const blob = new Blob([JSON.stringify(kcBuildPayload(currentKc), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = currentKc.code + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  currentKc.exportedAt = Date.now();
+  currentKc.updatedAt = Math.min(currentKc.updatedAt || 0, currentKc.exportedAt);
+  updateKc(currentKc);
+  updateKcStatus();
+});
+document.getElementById('btn-kc-test').addEventListener('click', () => {
+  if(!currentKc) return;
+  window.open(kcLink(currentKc), '_blank');
+});
+document.getElementById('btn-kc-detail-back').addEventListener('click', () => {
+  currentKc = null;
+  renderKcHome();
+  showScreen('kc-home');
+});
+document.getElementById('btn-kc-delete').addEventListener('click', () => {
+  if(!currentKc) return;
+  if(!confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo de la carpeta "mensajes" en GitHub. No se puede deshacer.')) return;
+  saveKcs(loadKcs().filter(k => k.id !== currentKc.id));
+  currentKc = null;
+  renderKcHome();
+  showScreen('kc-home');
 });
 
 /* ---------------- Mensajes rápidos ---------------- */
