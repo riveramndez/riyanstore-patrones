@@ -1011,6 +1011,25 @@
         </div>
 
         <p class="scan-hint" style="margin:10px 0 0;">Arrastra la insignia o el logo directo sobre la foto para moverlos.</p>
+
+        <div class="cost-section-title" style="margin-top:20px;">Imagen final</div>
+        <div class="cost-row">
+          <label>Tamaño máximo (lado más largo)</label>
+          <select id="wm-max-dim" style="width:110px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:9px 8px; font-size:14px;">
+            <option value="800">800 px</option>
+            <option value="1200">1200 px</option>
+            <option value="1600">1600 px</option>
+            <option value="2000" selected>2000 px</option>
+            <option value="3000">3000 px</option>
+          </select>
+        </div>
+        <div class="cost-row"><label>Calidad</label><input type="range" id="wm-quality" min="50" max="95" value="95"></div>
+        <p class="scan-hint" id="wm-size-info" style="margin:4px 0 10px;"></p>
+        <div class="cost-row">
+          <label>Nombre del archivo</label>
+        </div>
+        <input type="text" id="wm-filename" placeholder="ej. enfermera-ramo-reversible-1" style="width:100%; box-sizing:border-box; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:4px;">
+        <p class="scan-hint" style="margin:0;">Sin espacios ni acentos si la vas a usar para el catálogo (ej. usa "-" en vez de espacios).</p>
       </div>
 
       <button class="add-btn" id="btn-watermark-download" style="display:none;"><span class="plus">⬇️</span> Descargar imagen final</button>
@@ -1118,7 +1137,7 @@
 
       <div class="cost-section">
         <div class="cost-section-title">Publicar el mensaje</div>
-        <p class="scan-hint" style="margin:-4px 0 10px;">Para que el QR funcione, descarga el archivo y súbelo a GitHub dentro de la carpeta <strong>mensajes</strong> (como haces con las fotos de la carpeta imagenes). Cada vez que cambies algo de este llavero, vuelve a descargarlo y subirlo.</p>
+        <p class="scan-hint" style="margin:-4px 0 10px;">Para que el QR funcione, descarga el archivo y súbelo a GitHub con <strong>Upload files</strong> dentro de la carpeta <strong>mensajes</strong> (como haces con las fotos de la carpeta imagenes). Cada vez que cambies algo de este llavero, vuelve a descargarlo y subirlo para reemplazarlo.</p>
         <button class="add-btn" id="btn-kc-download-json"><span class="plus">📄</span> Descargar archivo del mensaje</button>
         <button class="add-btn secondary" id="btn-kc-test" style="margin-top:8px;"><span class="plus">🔎</span> Probar cómo se ve</button>
         <p class="scan-hint" id="kc-status" style="margin:10px 0 0;"></p>
@@ -3596,6 +3615,7 @@ document.getElementById('watermark-photo-input').addEventListener('change', (e) 
   const file = e.target.files[0];
   e.target.value = '';
   if(!file) return;
+  document.getElementById('wm-filename').value = (file.name || 'producto-marca-agua').replace(/\.[^.]+$/, '') || 'producto-marca-agua';
   const reader = new FileReader();
   reader.onload = () => {
     const img = new Image();
@@ -3614,6 +3634,11 @@ document.getElementById('watermark-photo-input').addEventListener('change', (e) 
 
 function drawWatermarkComposite(ctx, w, h){
   ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  // fondo blanco (si la foto es PNG con transparencia, no se vuelve negra al guardar como JPG)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
   ctx.drawImage(wmState.photoImg, 0, 0, w, h);
 
   if(wmState.center.enabled && centerLogoImg.complete && centerLogoImg.naturalWidth){
@@ -3641,12 +3666,51 @@ function renderWatermarkPreview(){
   if(!wmState.photoImg) return;
   const canvas = document.getElementById('watermark-preview-canvas');
   const containerWidth = document.querySelector('#watermark .cost-form').clientWidth || (window.innerWidth - 40);
-  const maxPreviewWidth = Math.min(460, containerWidth);
-  const scale = maxPreviewWidth / wmState.photoImg.naturalWidth;
-  canvas.width = Math.round(wmState.photoImg.naturalWidth * scale);
-  canvas.height = Math.round(wmState.photoImg.naturalHeight * scale);
+  const cssW = Math.min(460, containerWidth);
+  const ratio = wmState.photoImg.naturalHeight / wmState.photoImg.naturalWidth;
+  // la vista previa se dibuja con la resolución real de la pantalla (si no, se ve borrosa en celulares de alta densidad)
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const internalW = Math.min(Math.round(cssW * dpr), wmState.photoImg.naturalWidth);
+  canvas.width = internalW;
+  canvas.height = Math.round(internalW * ratio);
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = 'auto';
   drawWatermarkComposite(canvas.getContext('2d'), canvas.width, canvas.height);
+  scheduleWmSizeInfo();
 }
+
+// Muestra cuánto va a pesar la imagen final (igual que en "Comprimir foto"); se calcula un instante después de moverle algo
+let wmSizeInfoTimer = null;
+function scheduleWmSizeInfo(){
+  clearTimeout(wmSizeInfoTimer);
+  wmSizeInfoTimer = setTimeout(() => {
+    if(!wmState.photoImg) return;
+    const info = document.getElementById('wm-size-info');
+    const dims = wmOutputDims();
+    generateWatermarkBlob((blob) => {
+      if(!blob) return;
+      info.textContent = 'Imagen final: ' + (blob.size / 1024).toFixed(0) + ' KB (' + dims.w + '×' + dims.h + ' px)';
+    });
+  }, 500);
+}
+function wmOutputDims(){
+  const maxDim = parseInt(document.getElementById('wm-max-dim').value, 10) || 2000;
+  let w = wmState.photoImg.naturalWidth;
+  let h = wmState.photoImg.naturalHeight;
+  if(Math.max(w, h) > maxDim){
+    const scale = maxDim / Math.max(w, h);
+    w = Math.round(w * scale);
+    h = Math.round(h * scale);
+  }
+  return { w, h };
+}
+function wmOutputFileName(){
+  let name = (document.getElementById('wm-filename').value || '').trim().replace(/\.(jpe?g|png|webp)$/i, '');
+  name = name.replace(/[\\\/:*?"<>|]+/g, '-');
+  return (name || 'producto-marca-agua') + '.jpg';
+}
+document.getElementById('wm-max-dim').addEventListener('change', scheduleWmSizeInfo);
+document.getElementById('wm-quality').addEventListener('input', scheduleWmSizeInfo);
 
 document.getElementById('toggle-badge').addEventListener('click', (e) => {
   wmState.badge.enabled = !wmState.badge.enabled;
@@ -3742,19 +3806,13 @@ window.addEventListener('pointerup', () => { activeDragTarget = null; });
 
 function generateWatermarkBlob(callback){
   if(!wmState.photoImg) return;
-  const MAX_LONG_SIDE = 4000;
-  let w = wmState.photoImg.naturalWidth;
-  let h = wmState.photoImg.naturalHeight;
-  if(Math.max(w, h) > MAX_LONG_SIDE){
-    const scale = MAX_LONG_SIDE / Math.max(w, h);
-    w = Math.round(w * scale);
-    h = Math.round(h * scale);
-  }
+  const { w, h } = wmOutputDims();
+  const quality = (parseInt(document.getElementById('wm-quality').value, 10) || 95) / 100;
   const outCanvas = document.createElement('canvas');
   outCanvas.width = w;
   outCanvas.height = h;
   drawWatermarkComposite(outCanvas.getContext('2d'), w, h);
-  outCanvas.toBlob(callback, 'image/jpeg', 0.95);
+  outCanvas.toBlob(callback, 'image/jpeg', quality);
 }
 
 document.getElementById('btn-watermark-download').addEventListener('click', () => {
@@ -3762,7 +3820,7 @@ document.getElementById('btn-watermark-download').addEventListener('click', () =
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'producto-marca-agua.jpg';
+    a.download = wmOutputFileName();
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3772,7 +3830,7 @@ document.getElementById('btn-watermark-download').addEventListener('click', () =
 
 document.getElementById('btn-watermark-share').addEventListener('click', () => {
   generateWatermarkBlob(async (blob) => {
-    const file = new File([blob], 'producto-marca-agua.jpg', { type: 'image/jpeg' });
+    const file = new File([blob], wmOutputFileName(), { type: 'image/jpeg' });
     if(navigator.canShare && navigator.canShare({ files: [file] })){
       try{ await navigator.share({ files: [file] }); }
       catch(e){ /* el usuario canceló, no pasa nada */ }
@@ -4083,7 +4141,7 @@ function renderKcHome(){
     });
     card.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation();
-      if(confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo de la carpeta "mensajes" en GitHub. No se puede deshacer.')){
+      if(confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo (código.json) de la carpeta "mensajes" en GitHub. No se puede deshacer.')){
         saveKcs(loadKcs().filter(x => x.id !== k.id));
         renderKcHome();
       }
@@ -4204,7 +4262,7 @@ document.getElementById('btn-kc-detail-back').addEventListener('click', () => {
 });
 document.getElementById('btn-kc-delete').addEventListener('click', () => {
   if(!currentKc) return;
-  if(!confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo de la carpeta "mensajes" en GitHub. No se puede deshacer.')) return;
+  if(!confirm('¿Borrar este llavero? Su QR dejará de funcionar solo cuando borres también su archivo (código.json) de la carpeta "mensajes" en GitHub. No se puede deshacer.')) return;
   saveKcs(loadKcs().filter(k => k.id !== currentKc.id));
   currentKc = null;
   renderKcHome();
