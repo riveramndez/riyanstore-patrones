@@ -700,6 +700,7 @@
     <div class="viewer-top">
       <button class="icon-btn" id="btn-back">‹</button>
       <div class="viewer-title" id="viewer-title">Patrón</div>
+      <input type="text" id="free-name-input" class="cost-name-input" placeholder="¿Qué estás tejiendo? (ej. Boo – cuerpo)" maxlength="60" style="display:none;">
       <div class="page-nav">
         <button class="icon-btn" id="btn-prev-page" style="width:32px;height:32px;font-size:13px;">‹</button>
         <span id="page-indicator">1/1</span>
@@ -1715,7 +1716,7 @@ function renderResumeCard(patterns){
   const patternRecord = isFree ? null : patterns.find(p => p.id === best.id);
   if(!isFree && !patternRecord){ wrap.innerHTML = ''; return; } // el patrón fue borrado
 
-  const name = isFree ? 'Contador libre' : patternRecord.name;
+  const name = isFree ? ((best.prog.name || '').trim() || 'Contador libre') : patternRecord.name;
   const meta = 'Vuelta ' + (best.prog.vueltas || 0) + ' · ' + formatTime(best.prog.elapsedSeconds || 0) + (best.prog.marker ? ' · 📍 con marca' : '');
 
   wrap.innerHTML =
@@ -2087,6 +2088,8 @@ document.getElementById('modal-delete-confirm').addEventListener('click', async 
 
 /* ---------------- Abrir patrón / visor ---------------- */
 function setViewerFreeMode(isFree){
+  document.getElementById('viewer-title').style.display = isFree ? 'none' : '';
+  document.getElementById('free-name-input').style.display = isFree ? '' : 'none';
   document.querySelector('.page-nav').style.display = isFree ? 'none' : '';
   document.querySelector('.zoom-group').style.display = isFree ? 'none' : '';
   document.getElementById('pdf-canvas').style.display = isFree ? 'none' : '';
@@ -2120,6 +2123,7 @@ function openFreeSession(){
   currentPatternId = 'free';
   currentProgress = loadProgress('free') || defaultProgress();
   document.getElementById('viewer-title').textContent = 'Contador libre';
+  document.getElementById('free-name-input').value = currentProgress.name || '';
   setViewerFreeMode(true);
   updateCounterUI();
   updateTimerDisplay();
@@ -2127,6 +2131,13 @@ function openFreeSession(){
   requestWakeLock();
 }
 document.getElementById('btn-free-counter').addEventListener('click', openFreeSession);
+
+// Nombre de lo que se está tejiendo en el contador libre (se guarda solo al escribir)
+document.getElementById('free-name-input').addEventListener('input', (e) => {
+  if(currentPatternId !== 'free' || !currentProgress) return;
+  currentProgress.name = e.target.value.slice(0, 60);
+  persistProgress();
+});
 
 document.getElementById('btn-back').addEventListener('click', () => {
   pauseTimer();
@@ -4934,7 +4945,7 @@ async function renderStats(){
     try{ prog = JSON.parse(localStorage.getItem(key)); }catch(e){ continue; }
     if(!prog) continue;
     const id = key.slice('progress_'.length);
-    const label = id === 'free' ? 'Contador libre' : (nameById[id] || 'Patrón borrado');
+    const label = id === 'free' ? ((prog.name || '').trim() || 'Contador libre') : (nameById[id] || 'Patrón borrado');
     const seconds = prog.elapsedSeconds || 0;
     const vueltas = prog.vueltas || 0;
     if(seconds === 0 && vueltas === 0) continue;
