@@ -204,7 +204,7 @@
     f.setAttribute('allow', allow || 'autoplay; encrypted-media; picture-in-picture; fullscreen');
     f.setAttribute('allowfullscreen', '');
     f.setAttribute('loading', 'lazy');
-    f.setAttribute('referrerpolicy', 'no-referrer');
+    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin'); // YouTube exige referer (si no: error 153)
     return f;
   }
   function fallbackLink(parent, url, text){
@@ -322,8 +322,14 @@
   var code = getCode();
   if(!code){ showState('Este enlace no es válido. Intenta escanear el código otra vez.'); return; }
 
-  fetch('mensajes/' + code + '.json?v=' + Date.now(), { cache: 'no-store' })
-    .then(function(r){ if(!r.ok) throw new Error('nf'); return r.json(); })
+  // El archivo del mensaje puede estar en la carpeta "mensajes" o suelto junto a esta página (más fácil de subir desde el celular)
+  function loadMsg(path){
+    return fetch(path + '?v=' + Date.now(), { cache: 'no-store' })
+      .then(function(r){ if(!r.ok) throw new Error('nf'); return r.json(); })
+      .then(function(d){ if(!d || d.code !== code) throw new Error('bad'); return d; });
+  }
+  loadMsg('mensajes/' + code + '.json')
+    .catch(function(){ return loadMsg(code + '.json'); })
     .then(render)
     .catch(function(){ showState('No encontramos este mensaje. Si acabas de recibirlo, espera unos minutos e inténtalo de nuevo.'); });
 })();
