@@ -1,10 +1,10 @@
 {
   "storeName": "Riyan Store",
-  "storePhoneDisplay": "566 452 7042",
+  "storePhoneDisplay": "5664527042",
   "storePhoneDigits": "525664527042",
-  "storeDescription": "",
-  "storeHours": "",
-  "updatedAt": "2026-10-27T22:20:07.090Z",
+  "storeDescription": "Descubre la magia de RIYAN Store, donde encontrarás hermosos Amigurumis, Flores, Llaveros y otros artículos únicos a crochet, 100% hechos a mano con amor y dedicación. \n\nIdeales para regalar o para ti mismo, en cualquier ocasión especial.\n\nTodos nuestros productos se realizan bajo pedido. El tiempo de elaboración es de aproximadamente 2 semanas, aunque puede variar dependiendo de la complejidad del diseño y nuestro volumen de trabajo.\n\nLos precios varían dependiendo del diseño y tamaño.\n\nPara una mejor atención o cualquier duda.\nEscríbenos por WhatsApp.",
+  "storeHours": "Domingo Cerrado\nLunes       9:00 am - 5:00 p. m.\nMartes      9:00 am - 5:00 p. m.\nMiércoles 9:00 am - 5:00 p. m.\nJueves      9:00 am - 5:00 p. m.\nViernes     9:00 am - 5:00 p. m.\nSábado     9:00 am - 5:00 p. m.",
+  "updatedAt": "2026-10-27T22:39:52.845Z",
   "products": [
     {
       "id": "b14c1971-64bf-4c12-9857-bc9eff6a22f7",
@@ -596,9 +596,9 @@
       "name": "Centro de Mesa Cisnes ",
       "description": "Ideal para tu centro de mesa.",
       "price": 900,
-      "image": "https://riyanstore-patrones.pages.dev/imagenes/Centro- mesa- cisnes.jpg",
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/centro-mesa-cisnes.jpg",
       "images": [
-        "https://riyanstore-patrones.pages.dev/imagenes/Centro- mesa- cisnes2.jpg"
+        "https://riyanstore-patrones.pages.dev/imagenes/centro-mesa-cisnes1.jpg"
       ],
       "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Centro%20de%20Mesa%20Cisnes%20"
     },
@@ -640,7 +640,7 @@
       "name": "Bouquet de Rosas",
       "description": "",
       "price": 400,
-      "image": "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas1bouquet-rosas1.jpg",
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas1.jpg",
       "images": [
         "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas2.jpg",
         "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas3.jpg"
@@ -652,9 +652,9 @@
       "name": "Bouquet Rosas Rosas",
       "description": "",
       "price": 500,
-      "image": "https://riyanstore-patrones.pages.dev/imagenes/Bouquet-rosas-rosas1.jpg",
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas-rosas1.jpg",
       "images": [
-        "https://riyanstore-patrones.pages.dev/imagenes/Bouquet-rosas-rosas2.jpg"
+        "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas-rosas2.jpg"
       ],
       "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bouquet%20Rosas%20Rosas"
     },
