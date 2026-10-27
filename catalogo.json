@@ -1,15 +1,480 @@
 {
   "storeName": "Riyan Store",
-  "storePhoneDisplay": "5664527042",
+  "storePhoneDisplay": "566 452 7042",
   "storePhoneDigits": "525664527042",
-  "storeDescription": "Descubre la magia de RIYAN Store, donde encontrarás hermosos Amigurumis, Flores, Llaveros y otros artículos únicos a crochet, 100% hechos a mano con amor y dedicación. \n\nIdeales para regalar o para ti mismo, en cualquier ocasión especial.\n\nTodos nuestros productos se realizan bajo pedido. El tiempo de elaboración es de aproximadamente 2 semanas, aunque puede variar dependiendo de la complejidad del diseño y nuestro volumen de trabajo.\n\nLos precios varían dependiendo del diseño y tamaño.\n\nPara una mejor atención o cualquier duda.\nEscríbenos por WhatsApp.",
-  "storeHours": "Domingo Cerrado\nLunes       9:00 am - 5:00 p. m.\nMartes      9:00 am - 5:00 p. m.\nMiércoles 9:00 am - 5:00 p. m.\nJueves      9:00 am - 5:00 p. m.\nViernes     9:00 am - 5:00 p. m.\nSábado     9:00 am - 5:00 p. m.",
-  "updatedAt": "2026-09-29T07:49:24.847Z",
+  "storeDescription": "",
+  "storeHours": "",
+  "updatedAt": "2026-10-27T22:20:07.090Z",
   "products": [
     {
-      "id": "98d0427c-8449-4a8f-865b-c6332fa0d2eb",
+      "id": "b14c1971-64bf-4c12-9857-bc9eff6a22f7",
+      "name": "Llavero Lupita V3",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupitav4.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lupita%20V3"
+    },
+    {
+      "id": "bb2c2e4c-5de6-4e09-b2d9-9d5a78fdbb1f",
+      "name": "Llavero Lupita V2",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupitav3-1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupitav3-2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lupita%20V2"
+    },
+    {
+      "id": "876b8b67-2b69-4341-a1e1-8f7425cba347",
+      "name": "Llavero Lupita V1",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupitav2-1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lupita%20V1"
+    },
+    {
+      "id": "e098b6e9-966f-42be-bace-236b2c1e4328",
+      "name": "Llavero Lupita con Nombre",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupita-nombre1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lupita%20con%20Nombre"
+    },
+    {
+      "id": "91ee6ad6-f21f-44de-8dc8-f848bcc4b537",
+      "name": "Llavero hongo",
+      "description": "",
+      "price": 70,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-hongo-mariobros1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-hongo-mariobros2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20hongo"
+    },
+    {
+      "id": "d6dfe770-7758-47ed-9046-63bb148bb7e6",
+      "name": "Llavero Lupita",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lupita1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lupita"
+    },
+    {
+      "id": "0a5a6eb9-187f-448d-9c46-7307d6b96f58",
+      "name": "Llavero Lapiz",
+      "description": "",
+      "price": 120,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-lapiz1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-lapiz2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Lapiz"
+    },
+    {
+      "id": "7da81127-daa3-4f6b-b62a-a37f7669d408",
+      "name": "Llavero juditas",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-juditas.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20juditas"
+    },
+    {
+      "id": "75c3fdf4-e3d6-4a4c-a650-989a126476ed",
+      "name": "Llavero  Mario Bross y Honguito",
+      "description": "Puedes adquirilo junto o por separado. El costo puede variar.",
+      "price": 300,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-hongo-mariobros3.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20%20Mario%20Bross%20y%20Honguito"
+    },
+    {
+      "id": "17894f7d-e5f8-4cb5-8a7b-c83d29e443ac",
+      "name": "Llavero Corazon",
+      "description": "",
+      "price": 120,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-corazon1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-corazon2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Corazon"
+    },
+    {
+      "id": "48087994-3a40-41d9-8dde-7246d3af803d",
+      "name": "Llavero Conejo Cruz Azul",
+      "description": "",
+      "price": 180,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-conejo-cruzazul2.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-conejo-cruzazul1.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Conejo%20Cruz%20Azul"
+    },
+    {
+      "id": "3c2a926c-2468-4ee2-a0d6-1ce3e20783fa",
+      "name": "Llavero Virgen de la Concepcion",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-concepcion1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-concepcion2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Virgen%20de%20la%20Concepcion"
+    },
+    {
+      "id": "e4c3ab08-26d6-4685-ba1a-eeb069b9ed55",
+      "name": "Llavero Carlitos ",
+      "description": "",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-carlitos2.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-carlitos1.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Carlitos%20"
+    },
+    {
+      "id": "2101a647-1161-47a7-afc4-41bf597a3d2f",
+      "name": "Llavero Borreguito",
+      "description": "",
+      "price": 100,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-borreguito1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-borreguito2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Borreguito"
+    },
+    {
+      "id": "a20c1c11-231a-47f7-8582-4d731a498cf4",
+      "name": "Llavero Ajolote",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/llavero-ajolote1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Ajolote"
+    },
+    {
+      "id": "82b364ae-9fdc-48aa-b671-453d4fab9d67",
+      "name": "Lapicero Rosa Reversible",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/lapicero-rosa-reversible1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/lapicero-rosa-reversible2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/lapicero-rosa-reversible3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/lapicero-rosa-reversible4.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/lapicero-rosa-reversible5.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Lapicero%20Rosa%20Reversible"
+    },
+    {
+      "id": "9f8ad524-1392-470c-8fe0-d29cc4a30855",
+      "name": "Kuromi",
+      "description": "",
+      "price": 300,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/kuromi1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/kuromi2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Kuromi"
+    },
+    {
+      "id": "fac27e36-df8a-41df-97bf-b87b1c0e645b",
+      "name": "Jerry",
+      "description": "",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/jerry1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/jerry.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Jerry"
+    },
+    {
+      "id": "1a689005-a0d7-4f42-8518-accff047c465",
+      "name": "Sandalias Coquetas",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/huarache-0a3meses-niña1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/huarache-0a3meses-niña2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Sandalias%20Coquetas"
+    },
+    {
+      "id": "c99bcff7-f2f9-425f-9be6-edab89edf136",
+      "name": "Graduado Personalizado Victor",
+      "description": "Puedes adquirirlo solo o decorado con su caja de dulces. El precio puede variar dependiendo si le quieres agregar algún complemento.",
+      "price": 850,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Graduado%20Personalizado%20Victor"
+    },
+    {
+      "id": "2a29e050-cf49-4fec-955c-1c8f025d728d",
+      "name": "Graduado Perzonalizado",
+      "description": "",
+      "price": 700,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado2.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Graduado%20Perzonalizado"
+    },
+    {
+      "id": "e9618d5a-f355-4cb1-bbda-3c7f2cf1e057",
+      "name": "Graduada Pezonalizadaa",
+      "description": "",
+      "price": 850,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/graduada-personalizada1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Graduada%20Pezonalizadaa"
+    },
+    {
+      "id": "330330d7-2875-4e7c-b05e-400f34b1adef",
+      "name": "Graduada ",
+      "description": "",
+      "price": 700,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/graduada1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/graduada2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Graduada%20"
+    },
+    {
+      "id": "86e46e4e-8a5c-476a-88fe-3a3b3e1c5d0c",
+      "name": "Gorro Sonic",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gorro-sonic2.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gorro%20Sonic"
+    },
+    {
+      "id": "106d3745-546e-45f7-ba6f-3c74a6cdc922",
+      "name": "Gorro Minnie",
+      "description": "",
+      "price": 0,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gorro-minnie1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-minnie2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gorro%20Minnie"
+    },
+    {
+      "id": "6f969949-28bb-4b06-a786-88ae269861a2",
+      "name": "Gorro Gris para Dama",
+      "description": "Lo puedes adquirir en tu color favorito.",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gorro-gris1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-gris1.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gorro%20Gris%20para%20Dama"
+    },
+    {
+      "id": "5b9a696f-337f-4dc5-bdf2-95f2e14ae661",
+      "name": "Gorro y Bufanda para Gato",
+      "description": "",
+      "price": 200,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gorro-bufanda-minino1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-bufanda-minino2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-bufanda-minino3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-bufanda-minino4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gorro%20y%20Bufanda%20para%20Gato"
+    },
+    {
+      "id": "93d7ddda-f5d7-4427-8406-396e4d9ddd85",
+      "name": "Gorro Azul para Gato ",
+      "description": "Puedes adquirirlo en el color que gustes.",
+      "price": 100,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gorro-azul-minino1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-azul-minino2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/gorro-azul-minino3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gorro%20Azul%20para%20Gato%20"
+    },
+    {
+      "id": "e6d00d23-d289-48ab-b519-5f67f59270e8",
+      "name": "Goku",
+      "description": "",
+      "price": 350,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/goku1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Goku"
+    },
+    {
+      "id": "c57239bb-41b4-4f50-b5be-b894ea92ec17",
+      "name": "Ramo Girasol🌻",
+      "description": "",
+      "price": 400,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasolesv3.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Ramo%20Girasol%F0%9F%8C%BB"
+    },
+    {
+      "id": "d7852442-141f-4da0-9173-980ae6a4952b",
+      "name": "Girasol Shrek",
+      "description": "Costo extra si lo quieres con cajita.",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-shrek1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-shrek2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol%20Shrek"
+    },
+    {
+      "id": "c4f62529-9e1c-47c9-a84b-7088272c586e",
+      "name": "Girasol Reversible ",
+      "description": "",
+      "price": 700,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-reversible1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-reversible2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-reversible3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-reversible4.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-reversible5.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol%20Reversible%20"
+    },
+    {
+      "id": "42f57a4c-7778-47d9-b76f-cc7f736fcf4f",
+      "name": "Girasol Muñeca Reversible ",
+      "description": "",
+      "price": 700,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-muñeca-reversible1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-muñeca-reversible2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-muñeca-reversible3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-muñeca-reversible4.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-muñeca-reversible5.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol%20Mu%C3%B1eca%20Reversible%20"
+    },
+    {
+      "id": "995b4975-875b-4479-aec1-fad8b5581191",
+      "name": "Girasol con  Maceta 😊",
+      "description": "",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-maceta-carita.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol%20con%20%20Maceta%20%F0%9F%98%8A"
+    },
+    {
+      "id": "6f60ccb4-c415-4d8d-a570-32efc5744c49",
+      "name": "Llavero Girasol",
+      "description": "",
+      "price": 60,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-hoja-llavero1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-hoja-llavero2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llavero%20Girasol"
+    },
+    {
+      "id": "4ca572c7-25a5-4005-a183-f60c99771816",
+      "name": "Flor Shrek y Fiona❤️",
+      "description": "",
+      "price": 300,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-fiona-shrek1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Flor%20Shrek%20y%20Fiona%E2%9D%A4%EF%B8%8F"
+    },
+    {
+      "id": "b07b795f-22ae-430b-90c1-5c79c82cea25",
+      "name": "Flor Cerdito",
+      "description": "Puedes adquirirlo en tu color favorito.",
+      "price": 120,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/girasol-cerdito1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-cerdito2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/girasol-cerdito3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Flor%20Cerdito"
+    },
+    {
+      "id": "828855ee-7092-4d4c-87f3-f9ce4087bcd8",
+      "name": "Gerbera Muñeca  Reversible",
+      "description": "Puedes adquirirla en tu color preferido",
+      "price": 300,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gerbera-muñeca-reversible1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/gerbera-muñeca-reversible2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gerbera%20Mu%C3%B1eca%20%20Reversible"
+    },
+    {
+      "id": "5d98b30d-de23-4a92-a066-9ef03aeacdeb",
+      "name": "Tulipán ",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/flor-tulipan1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Tulip%C3%A1n%20"
+    },
+    {
+      "id": "7c5f4a00-cae7-46f4-add2-3ea830363a49",
+      "name": "Flor Rapunzel y Pascal",
+      "description": "",
+      "price": 200,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/flor-rapunzel1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Flor%20Rapunzel%20y%20Pascal"
+    },
+    {
+      "id": "e7558253-8655-40ee-a9b7-4f4e7411836d",
+      "name": "Girasol con corazon",
+      "description": "",
+      "price": 350,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/flor-girasol-corazon1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol%20con%20corazon"
+    },
+    {
+      "id": "d65e1463-ae72-40eb-a646-e3bfac882028",
+      "name": "Girasol",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/flor-girasol1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Girasol"
+    },
+    {
+      "id": "bb405061-b3c4-4fc7-97b0-6bd2b3a99d08",
+      "name": "Personalizado Fiona ",
+      "description": "Podemos realizar amigurumis personalizados de tu mascota. El precio puede variar dependiendo al diseño y tamaño.",
+      "price": 600,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/fiona1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/fiona2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/fiona3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Personalizado%20Fiona%20"
+    },
+    {
+      "id": "2e425d96-a765-46bb-b006-68936eee6b11",
+      "name": "Esfera del Dragón 🐉",
+      "description": "",
+      "price": 60,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/esfera-dragon.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Esfera%20del%20Drag%C3%B3n%20%F0%9F%90%89"
+    },
+    {
+      "id": "67e5690c-084b-4ad2-8e04-2b78c66f25f5",
       "name": "Enfermera Ramo Reversible",
-      "description": "Enfermera personalizada en ramo reversible.",
+      "description": "",
       "price": 2800,
       "image": "https://riyanstore-patrones.pages.dev/imagenes/enfermera-ramo-reversible1.jpg",
       "images": [
@@ -22,21 +487,330 @@
       "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Enfermera%20Ramo%20Reversible"
     },
     {
-      "id": "c2708aee-067d-46c2-a4b7-805b63dc231d",
-      "name": "Marino",
-      "description": "Amigurumi de la Marina Personalizado",
-      "price": 900,
-      "image": "https://riyanstore-patrones.pages.dev/imagenes/marino1.jpg",
+      "id": "25a859b9-93dd-466a-b9d3-0ff4d7625471",
+      "name": "Elmo ",
+      "description": "",
+      "price": 600,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/elmo1.jpg",
       "images": [
-        "https://riyanstore-patrones.pages.dev/imagenes/marino2.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino3.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino4.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino5.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino6.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino7.jpg",
-        "https://riyanstore-patrones.pages.dev/imagenes/marino8.jpg"
+        "https://riyanstore-patrones.pages.dev/imagenes/elmo2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/elmo3.jpg"
       ],
-      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Marino"
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Elmo%20"
+    },
+    {
+      "id": "44121707-c21b-4c42-aa3f-7b04a11de3db",
+      "name": "Boo y su Disfraz",
+      "description": "Puedes adquirirlo junto o por separado. El precio puede varias depende al tamaño.",
+      "price": 800,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/Disfraz-boo1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/Disfraz-boo2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/Disfraz-boo3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/Disfraz-boo4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Boo%20y%20su%20Disfraz"
+    },
+    {
+      "id": "353a7c6a-3223-4c93-a619-4812ea5b87e0",
+      "name": "Denario Rojo Lupita",
+      "description": "Colores a elección del cliente",
+      "price": 200,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/denario-lupita-rojo1.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Denario%20Rojo%20Lupita"
+    },
+    {
+      "id": "0260784d-814d-4a81-9e5f-e0c8798eae7e",
+      "name": "Denario Blanco Lupita",
+      "description": "Colores a elección del cliente",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/denario-lupita-blanco1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/denario-lupita-blanco2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Denario%20Blanco%20Lupita"
+    },
+    {
+      "id": "82bca253-6a1c-47f1-a66c-45b3b778ec3b",
+      "name": "Conjunto Bebé ",
+      "description": "Se pueden realizar en diferentes diseños claro el precio cambiaria.\n\nDe igual manera puede adquirir solo un accesorio",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/conjunto-bebe.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Conjunto%20Beb%C3%A9%20"
+    },
+    {
+      "id": "b6b3a55b-71c7-4016-825f-dd12667856b1",
+      "name": "Colgante Spiderman",
+      "description": "",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/colgante-spider-man1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/colgante-spider-man2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/colgante-spider-man3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/colgante-spider-man4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Colgante%20Spiderman"
+    },
+    {
+      "id": "5afed506-8721-406a-bc83-a1d74f72256f",
+      "name": "Clavel Muñeca Reversible",
+      "description": "Color a elección del cliente",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/clavel-reversible1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/clavel-reversible2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/clavel-reversible3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/clavel-reversible4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Clavel%20Mu%C3%B1eca%20Reversible"
+    },
+    {
+      "id": "35da3643-36e8-4c46-b492-3edab4bd37f7",
+      "name": "Chilindrina",
+      "description": "",
+      "price": 800,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/chilindrina1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/chilindrina2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Chilindrina"
+    },
+    {
+      "id": "47ec24ce-6816-4711-9578-d5ce2f677faf",
+      "name": "Centros de Mesa Columpio",
+      "description": "Centros de mesa ideales para tus fiestas.",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/Centromesa-columpio-azul1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/Centromesa-columpio-azul2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/Centromesa-columpio-azul3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/centromesa-columpio-rosa1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/centromesa-columpio-rosa2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Centros%20de%20Mesa%20Columpio"
+    },
+    {
+      "id": "b3ec705d-f6f4-4f64-96b5-221692f1807f",
+      "name": "Centro de Mesa Cisnes ",
+      "description": "Ideal para tu centro de mesa.",
+      "price": 900,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/Centro- mesa- cisnes.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/Centro- mesa- cisnes2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Centro%20de%20Mesa%20Cisnes%20"
+    },
+    {
+      "id": "f1066dc2-835c-430b-9bdb-54c341fc0e63",
+      "name": "Llaveros Capibara",
+      "description": "Elige tu capibara favorito.",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/capibara-fresa-rana5.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-fresa-rana4.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-fresa1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-fresa2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-fresa3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-rana1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-rana2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-mochila-rana3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-tortuga1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/capibara-tortuga2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/Capibara-tortuga3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Llaveros%20Capibara"
+    },
+    {
+      "id": "96a6544b-d587-4dc7-8d32-83fa98494399",
+      "name": "Búho Graduado",
+      "description": "Puedes elegir el búho solo.\nCon los globos donde podrás elegir los colores de estas.\nYa sea con cajita o alguna otra decoración a tu gusto.\nEl precio podria variar.",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/buho-graduado1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/buho-graduado2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/buho-graduado3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/buho-graduado-cafe.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20B%C3%BAho%20Graduado"
+    },
+    {
+      "id": "48839ffa-cad7-4730-94e5-fcaaaa486cf5",
+      "name": "Bouquet de Rosas",
+      "description": "",
+      "price": 400,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas1bouquet-rosas1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bouquet%20de%20Rosas"
+    },
+    {
+      "id": "fd91abbf-3b93-422e-89fc-cd6777e6dee8",
+      "name": "Bouquet Rosas Rosas",
+      "description": "",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/Bouquet-rosas-rosas1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/Bouquet-rosas-rosas2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bouquet%20Rosas%20Rosas"
+    },
+    {
+      "id": "7a95ccb2-7794-420c-af60-c9a840acee9d",
+      "name": "Bouquet Rosas rojas ",
+      "description": "Colores a elección del cliente, costo extra por agregar algún complemento.",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas-rojas1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/bouquet-rosas-rojas2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bouquet%20Rosas%20rojas%20"
+    },
+    {
+      "id": "d3570e1b-28c3-427e-9f7a-503b03971c35",
+      "name": "Bolso Rana  ",
+      "description": "Los colores son a elección del cliente.",
+      "price": 300,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bolso-rana1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/bolso-rana2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bolso%20Rana%20%20"
+    },
+    {
+      "id": "edd0f480-2ed4-4330-8fa2-b895b54b74e2",
+      "name": "Bolso Rana Roja",
+      "description": "Los colores son a elección del cliente",
+      "price": 500,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bolso-rana-roja1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/bolso-rana-roja2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bolso%20Rana%20Roja"
+    },
+    {
+      "id": "1198bff4-8e2d-4dc0-9ccb-9d13ae02d064",
+      "name": "Black Panther",
+      "description": "Puedes adquirirlo solo o con su llavero.",
+      "price": 350,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/black-panther1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/black-panther2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/llavero-black-panther3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Black%20Panther"
+    },
+    {
+      "id": "6539f7b0-c8cd-473b-8559-6351e312521f",
+      "name": "Bella Durmiente",
+      "description": "El precio varía dependiendo el tamaño, puedes adquirirla para centros de mesa o para tu colección.",
+      "price": 250,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/bella-durmiente1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/bella-durmiente2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/bella-durmiente3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Bella%20Durmiente"
+    },
+    {
+      "id": "a6eafbd2-5ee6-4400-953b-d850422f60ad",
+      "name": "Kit Aretes y anillo Girasol",
+      "description": "",
+      "price": 180,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/aretes-anillo1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/aretes-anillo2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Kit%20Aretes%20y%20anillo%20Girasol"
+    },
+    {
+      "id": "00ce89b0-53a2-40a5-9797-da7843af123d",
+      "name": "Afredito",
+      "description": "El precio varía dependiendo de diseño y tamaño",
+      "price": 800,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/alfredito1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/alfredito2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Afredito"
+    },
+    {
+      "id": "2f637dc3-dd8c-446e-91b2-9c5f5724288c",
+      "name": "Alfiletero Tortuga Girasol",
+      "description": "",
+      "price": 150,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/alfiletero-tortuga-girasol1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/alfiletero-tortuga-girasol2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/alfiletero-tortuga-girasol3.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Alfiletero%20Tortuga%20Girasol"
+    },
+    {
+      "id": "a09e5286-ba6e-4680-afa5-e6360744732f",
+      "name": "Rosa con Macetero",
+      "description": "",
+      "price": 200,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/rosa-maceta-carita.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Rosa%20con%20Macetero"
+    },
+    {
+      "id": "529f01d5-fe79-4e1e-967b-8cc6cde2e476",
+      "name": "Portalapiz Lanzaguisantes",
+      "description": "",
+      "price": 100,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/porta-lapiz-lanzaguisantes.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Portalapiz%20Lanzaguisantes"
+    },
+    {
+      "id": "78718180-9a4c-4336-a2e2-4b4a74fe1303",
+      "name": "Arreglos varios ",
+      "description": "Arreglos varios, los precios son individuales dependiendo del diseño, mande WhatsApp para mayor información.",
+      "price": 200,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/arreglos-varios1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/arreglos-varios2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Arreglos%20varios%20"
+    },
+    {
+      "id": "87cb7220-12d6-4217-a3ec-9ad2618e8499",
+      "name": "Graduado Personalizado",
+      "description": "Graduado Personalizado de preescolar.",
+      "price": 900,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor2.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor1.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor3.jpg",
+        "https://riyanstore-patrones.pages.dev/imagenes/graduado-personalizado-victor4.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Graduado%20Personalizado"
+    },
+    {
+      "id": "6c734ca4-11cf-4c0a-a2e6-94c3a6d272dd",
+      "name": "Winnie Pooh",
+      "description": "",
+      "price": 600,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/winnie-the-pooh1.jpg",
+      "images": [
+        "https://riyanstore-patrones.pages.dev/imagenes/winnie-the-pooh2.jpg"
+      ],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Winnie%20Pooh"
+    },
+    {
+      "id": "e1a9325c-5c4c-4774-875b-c96eba5fc782",
+      "name": "Gato Porta Gafas",
+      "description": "",
+      "price": 160,
+      "image": "https://riyanstore-patrones.pages.dev/imagenes/gato-porta-gafas.jpg",
+      "images": [],
+      "whatsappLink": "https://wa.me/525664527042?text=Me%20interesa%3A%20Gato%20Porta%20Gafas"
     }
   ]
 }
